@@ -21,5 +21,5 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: false
-          file: ../backend/Dockerfile
+          file: ./backend/Dockerfile
           tags: backend/app:latest
