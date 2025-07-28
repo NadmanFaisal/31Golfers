@@ -1,7 +1,6 @@
 // Tells prisma to generate a client to interact with DB 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 // Connects to the DB using the URL
@@ -10,37 +9,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Creates a collection of 'Post' with required 
-// attributes
-model Post {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  slug     String    @unique
-  title    String
-  body     String
-  author   User      @relation(fields: [authorId], references: [id])
-  authorId String    @db.ObjectId
-  comments Comment[]
-}
-
 model User {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   email   String   @unique
   name    String?
-  address Address?
-  posts   Post[]
-}
-
-model Comment {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  comment String
-  post    Post   @relation(fields: [postId], references: [id])
-  postId  String @db.ObjectId
-}
-
-// Address is an embedded document
-type Address {
-  street String
-  city   String
-  state  String
-  zip    String
 }

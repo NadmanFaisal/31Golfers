@@ -1,14 +1,13 @@
 const express = require('express');
-const aboutRoutes = require('./routes/aboutRoutes')
+const userRoutes = require('./routes/userRoutes')
 const app = express();
 const PORT = 3000;
 
-// Use the router for the /about path
-app.use('/about', aboutRoutes);
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Home Page');
-});
+// Use the router for the /user path
+app.use('/user', userRoutes);
+
 
 app.listen(PORT, (error) =>{
     if(!error)
