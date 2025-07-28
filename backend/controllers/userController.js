@@ -5,13 +5,24 @@ const prisma = new PrismaClient();
 exports.create_user = async (req, res, next) => {
   try {
     const email = req.body.email
-    const name = req.body.name
+    const username = req.body.username
+    const password = req.body.password
 
-    const user = await prisma.user.create({
-      data: { email, name },
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    })
+
+    if(user) {
+      return res.status(400).json({ message: 'Email already exists.' });
+    }
+
+    const newUser = await prisma.user.create({
+      data: { email, username, password },
     });
 
-    res.status(201).json(user);
+    res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create user' });
