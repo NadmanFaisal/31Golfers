@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Image, Button, Alert } from 'react-native';
+import { SafeAreaView, Text, View, Image, Button, Alert } from 'react-native';
 import { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Link, router } from 'expo-router';
@@ -6,6 +6,7 @@ import { Link, router } from 'expo-router';
 import styles from './styles';
 import { loginUser } from '../api/auth';
 import { AuthorizationInputField } from '../components/inputFields';
+import { AuthorizationButton } from '../components/Buttons';
 
 
 export default function DetailsScreen() {
@@ -57,22 +58,39 @@ export default function DetailsScreen() {
             resizeMode='contain'
           />
         </View>
-        <AuthorizationInputField 
-          input={email} 
-          handleChange={setEmail}
-        />
-        <AuthorizationInputField 
-          input={password} 
-          handleChange={setPassword}
-        />
+        <View style={styles.inputFieldContainer}>
+          <AuthorizationInputField 
+            input={email}
+            placeholderText='email@email.com'
+            handleChange={setEmail}
+          />
+          <AuthorizationInputField 
+            input={password} 
+            placeholderText='Password'
+            securedTextEntry={true}
+            handleChange={setPassword}
+          />
+        </View>
 
-        <Button
-          onPress={() => handleLogin(email, password)}
-          title="Login"
-          color="#841584"
-          accessibilityLabel="Sign up as a user!"
-        />
-        <Link href='./signup'>Or signup</Link>
+        <View style={styles.buttonContainer}>
+          <AuthorizationButton
+            text='Login'
+            height={50}
+            width={175}
+            color='#0FBE41'
+            pressedColor='#098b2eff'
+            onPress={() => handleLogin(email, password)}
+          />
+          <Text style={styles.choiceText}>Don&apos;t have an account?</Text>
+          <AuthorizationButton
+            text='Sign Up'
+            height={50}
+            width={175}
+            color='#A0A0A0'
+            pressedColor='#818181ff'
+            onPress={() => router.dismissTo('/signup')}
+          />
+        </View>
         
       </View>
     </SafeAreaView>

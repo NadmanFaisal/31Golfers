@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   logoContainer: {
     display: 'flex',
     width: '100%',
-    height: '50%',
+    height: '40%',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
@@ -27,13 +27,21 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: '30%'
+    height: '25%',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   },
   buttonContainer: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     height: '20%'
+  },
+  choiceText: {
+    color: '#A0A0A0',
+    margin: 6
   }
 });
 

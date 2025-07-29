@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Image, Button, Alert } from 'react-native';
+import { SafeAreaView, View, Text, Image, Button, Alert } from 'react-native';
 import { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Link, router } from 'expo-router';
@@ -6,6 +6,7 @@ import { Link, router } from 'expo-router';
 import styles from './styles';
 import { signupUser } from '../api/auth';
 import { AuthorizationInputField } from '../components/inputFields';
+import { AuthorizationButton } from '../components/Buttons';
 
 
 export default function DetailsScreen() {
@@ -58,27 +59,44 @@ export default function DetailsScreen() {
             resizeMode='contain'
           />
         </View>
-        <AuthorizationInputField 
-          input={email} 
-          handleChange={setEmail}
-        />
-        <AuthorizationInputField 
-          input={username} 
-          handleChange={setUsername}
-        />
-        <AuthorizationInputField 
-          input={password} 
-          handleChange={setPassword}
-        />
+        <View style={styles.inputFieldContainer}>
+          <AuthorizationInputField 
+            input={email}
+            placeholderText='Email@email.com'
+            handleChange={setEmail}
+          />
+          <AuthorizationInputField 
+            input={username} 
+            placeholderText='Username'
+            handleChange={setUsername}
+          />
+          <AuthorizationInputField 
+            input={password} 
+            placeholderText='Password'
+            securedTextEntry={true}
+            handleChange={setPassword}
+          />
+        </View>
 
-        <Button
-          onPress={() => handleSignup(email, username, password)}
-          title="Sign up"
-          color="#841584"
-          accessibilityLabel="Sign up as a user!"
-        />
-
-        <Link href='./login'>Or login</Link>
+        <View style={styles.buttonContainer}> 
+          <AuthorizationButton
+            text='Sign up'
+            height={50}
+            width={175}
+            color='#0FBE41'
+            pressedColor='#098b2eff'
+            onPress={() => handleSignup(email, username, password)}
+          />
+          <Text style={styles.choiceText}>Already have an account?</Text>
+          <AuthorizationButton
+            text='Log in'
+            height={50}
+            width={175}
+            color='#A0A0A0'
+            pressedColor='#818181ff'
+            onPress={() => router.dismissTo('/login')}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

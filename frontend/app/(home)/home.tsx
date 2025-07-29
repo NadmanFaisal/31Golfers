@@ -10,8 +10,11 @@ export default function HomeScreen () {
 
     // Fetch the token stored in SecureStore
     useEffect(() => {
-        const getToken = () => {
-            const fetchedToken = SecureStore.getItem('token')
+        const getToken = async () => {
+            const fetchedToken = await SecureStore.getItem('token')
+            if(!fetchedToken) {
+                router.dismissTo('/(auth)/login')
+            }
             setToken(fetchedToken)
             console.log('Token:', token)
         }
