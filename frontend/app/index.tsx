@@ -1,15 +1,16 @@
-import { Text, View } from "react-native";
+import Home from './(home)/home'
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    // <View
+    //   style={{
+    //     flex: 1,
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //   }}
+    // >
+    //   <Link href="/signup">View signup screen</Link>
+    // </View>
+    <Home />
   );
 }

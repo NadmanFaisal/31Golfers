@@ -1,14 +1,22 @@
 const express = require('express');
-const aboutRoutes = require('./routes/aboutRoutes')
+const dotenv = require('dotenv')
+
+const userRoutes = require('./routes/userRoutes')
+const authenticateToken = require('./middleware/authMiddleware');
+
+// Global env configuration
+dotenv.config();
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Use the router for the /about path
-app.use('/about', aboutRoutes);
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Home Page');
-});
+// Mount user-related routes at /signup endpoint
+app.use('/', userRoutes);
+
+// Mount protected route group
+app.use('/protected', authenticateToken)
 
 app.listen(PORT, (error) =>{
     if(!error)
