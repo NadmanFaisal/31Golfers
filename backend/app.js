@@ -1,12 +1,17 @@
 const express = require('express');
+const dotenv = require('dotenv')
+
 const userRoutes = require('./routes/userRoutes')
+const jwtRoutes = require('./routes/jwtRoutes')
+
+dotenv.config();
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-
-// Use the router for the /user path
 app.use('/user', userRoutes);
+app.use('/jwt', jwtRoutes);
 
 
 app.listen(PORT, (error) =>{
