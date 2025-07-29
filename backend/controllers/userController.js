@@ -1,4 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
+
+const jwt = require('jsonwebtoken')
+
 const prisma = new PrismaClient();
 
 // Creates user, response 201 upon success
@@ -22,7 +25,10 @@ exports.create_user = async (req, res, next) => {
       data: { email, username, password },
     });
 
-    res.status(201).json(newUser);
+    const payload = { userId: newUser.id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '48h' });
+    
+    res.status(201).json({newUser, token});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create user' });

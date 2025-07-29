@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv')
 
 const userRoutes = require('./routes/userRoutes')
-const jwtRoutes = require('./routes/jwtRoutes')
+const authenticateToken = require('./middleware/authMiddleware');
 
 dotenv.config();
 
@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use('/user', userRoutes);
-app.use('/jwt', jwtRoutes);
 
 
 app.listen(PORT, (error) =>{
