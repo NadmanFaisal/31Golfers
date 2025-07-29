@@ -58,3 +58,50 @@ exports.create_user = async (req, res) => {
     res.status(500).json({ error: 'Failed to create user' });
   }
 };
+
+/**
+ * Creates a new user and returns a JWT token upon successful registration.
+ * 
+ *  - Checks if the email is already registered
+ *  - Creates a new user in the database
+ *  - Signs a JWT with the new user's ID
+ *  - Returns the new user and the token in the response
+ * 
+ * @param {object} req Express request object
+ * @param {object} res Express response object
+ * @returns {Response} JSON containing the new user and JWT token
+ */
+exports.login_user = async (req, res) => {
+  try {
+    const email = req.body.email
+    const password = req.body.password
+
+    /**
+     * Queries to find if user with the same email
+     * exists. 
+     */
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    })
+
+    if(!user) {
+      return res.status(404).json({ message: `User with the email doesn't exist.` });
+    }
+
+   
+
+    if(bcrypt.compare(password, user.password)) {
+      const payload = { userId: user.id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '48h' });
+      console.log('logged in')
+      return res.status(200).json({user, token});
+    }
+
+    return res.status(401).json({message: 'Wrong password. Please try again'})
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+};

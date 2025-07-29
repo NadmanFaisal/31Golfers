@@ -1,46 +1,49 @@
-import { SafeAreaView, View, Text, Image, Button, Alert } from 'react-native';
-import { useEffect, useState } from 'react';
+import { SafeAreaView, View, Image, Button, Alert } from 'react-native';
+import { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-
-import { signupUser } from '../api/auth';
-import { AuthorizationInputField } from '../components/inputFields';
+import { Link, router } from 'expo-router';
 
 import styles from './styles';
+import { loginUser } from '../api/auth';
+import { AuthorizationInputField } from '../components/inputFields';
+
 
 export default function DetailsScreen() {
 
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
   /**
-  * Handles the user signup process:
+  * Handles the user login process:
   * - Validates required input fields
-  * - Sends signup request to backend
+  * - Sends login request to backend
   * - Stores the JWT token securely on success
   * - Alerts the user in case of error
   */
-  const handleSignup = async (email: string, username: string, password: string) => {
-    if(email === '' || username === '' || password === '') {
+  const handleLogin = async (email: string, password: string) => {
+    if(email === '' || password === '') {
       Alert.alert('Important fields cannot be empty.')
       return
     }
     try {
-      const response = await signupUser(email, username, password)
+      const response = await loginUser(email, password)
 
       // Upon successful signing up
-      if(response.status === 201) {
-        console.log('Signup response:', response.data.newUser)
+      if(response.status === 200) {
+        console.log('Login response:', response.data.user)
 
         // Stores the token for future authorization
         SecureStore.setItem('token', response.data.token)
+
+        // Navigate to homepage
+        router.dismissTo('/(home)/home')
         return
       }
     } catch(err: any) {
-      Alert.alert('Error signing up: ', err.message)
+      Alert.alert('Error login in: ', err.message)
       return
     }
   }
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -59,20 +62,18 @@ export default function DetailsScreen() {
           handleChange={setEmail}
         />
         <AuthorizationInputField 
-          input={username} 
-          handleChange={setUsername}
-        />
-        <AuthorizationInputField 
           input={password} 
           handleChange={setPassword}
         />
 
         <Button
-          onPress={() => handleSignup(email, username, password)}
-          title="Sign up"
+          onPress={() => handleLogin(email, password)}
+          title="Login"
           color="#841584"
           accessibilityLabel="Sign up as a user!"
         />
+        <Link href='./signup'>Or signup</Link>
+        
       </View>
     </SafeAreaView>
   );

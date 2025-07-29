@@ -7,7 +7,19 @@ export default function RootLayout() {
         options={{
           headerShown: false,
         }}/>
-      <Stack.Screen name="(signup)/signup" 
+      <Stack.Screen name="(auth)/signup" 
+        options={{
+          headerTitle: '',
+          headerShown: false
+        }}
+      />
+      <Stack.Screen name="(auth)/login" 
+        options={{
+          headerTitle: '',
+          headerShown: false
+        }}
+      />
+      <Stack.Screen name="(home)/home" 
         options={{
           headerTitle: '',
           headerShown: false

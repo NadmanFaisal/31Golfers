@@ -12,9 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Mount user-related routes at /user endpoint
-app.use('/user', userRoutes);
-
+// Mount user-related routes at /signup endpoint
+app.use('/', userRoutes);
 
 app.listen(PORT, (error) =>{
     if(!error)

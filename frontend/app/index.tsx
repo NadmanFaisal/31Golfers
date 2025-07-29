@@ -1,6 +1,4 @@
-import { Link } from "expo-router";
-import { Text, View } from "react-native";
-import SignupScreen from './(signup)/signup'
+import LoginScreen from './(auth)/login'
 
 export default function Index() {
   return (
@@ -13,6 +11,6 @@ export default function Index() {
     // >
     //   <Link href="/signup">View signup screen</Link>
     // </View>
-    <SignupScreen />
+    <LoginScreen />
   );
 }
