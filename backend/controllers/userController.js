@@ -60,7 +60,7 @@ exports.create_user = async (req, res) => {
 };
 
 /**
- * Creates a new user and returns a JWT token upon successful registration.
+ * Logs in user and returns a JWT token upon successful registration.
  * 
  *  - Checks if the email is already registered
  *  - Creates a new user in the database
@@ -90,11 +90,9 @@ exports.login_user = async (req, res) => {
       return res.status(404).json({ message: `User with the email doesn't exist.` });
     }
 
-   
-
     if(bcrypt.compare(password, user.password)) {
       const payload = { userId: user.id };
-      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '48h' });
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
       console.log('logged in')
       return res.status(200).json({user, token});
     }

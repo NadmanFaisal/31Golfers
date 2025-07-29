@@ -29,3 +29,18 @@ export async function loginUser(email: string, password: string) {
         throw new Error(message);
     }
 }
+
+// export async function validateToken(token: string) {
+//   try {
+//     const response = await api.get('/protected', {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     return response.status === 200
+//   } catch (error) {
+//     console.error('Token validation failed:', error);
+//     return false;
+//   }
+// }

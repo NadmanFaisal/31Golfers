@@ -1,4 +1,4 @@
-import LoginScreen from './(auth)/login'
+import Home from './(home)/home'
 
 export default function Index() {
   return (
@@ -11,6 +11,6 @@ export default function Index() {
     // >
     //   <Link href="/signup">View signup screen</Link>
     // </View>
-    <LoginScreen />
+    <Home />
   );
 }

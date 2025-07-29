@@ -15,6 +15,9 @@ app.use(express.json());
 // Mount user-related routes at /signup endpoint
 app.use('/', userRoutes);
 
+// Mount protected route group
+app.use('/protected', authenticateToken)
+
 app.listen(PORT, (error) =>{
     if(!error)
         console.log("Server is Successfully Running, and App is listening on port "+ PORT);
