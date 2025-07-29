@@ -4,12 +4,15 @@ const dotenv = require('dotenv')
 const userRoutes = require('./routes/userRoutes')
 const authenticateToken = require('./middleware/authMiddleware');
 
+// Global env configuration
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Mount user-related routes at /user endpoint
 app.use('/user', userRoutes);
 
 

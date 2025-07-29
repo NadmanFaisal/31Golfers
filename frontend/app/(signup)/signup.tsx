@@ -1,5 +1,6 @@
 import { SafeAreaView, View, Text, Image, Button, Alert } from 'react-native';
 import { useEffect, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
 
 import { signupUser } from '../api/auth';
 import { AuthorizationInputField } from '../components/inputFields';
@@ -8,6 +9,13 @@ import styles from './styles';
 
 export default function DetailsScreen() {
 
+  /**
+  * Handles the user signup process:
+  * - Validates required input fields
+  * - Sends signup request to backend
+  * - Stores the JWT token securely on success
+  * - Alerts the user in case of error
+  */
   const handleSignup = async (email: string, username: string, password: string) => {
     if(email === '' || username === '' || password === '') {
       Alert.alert('Important fields cannot be empty.')
@@ -15,8 +23,15 @@ export default function DetailsScreen() {
     }
     try {
       const response = await signupUser(email, username, password)
-      console.log(response.data)
-      return
+
+      // Upon successful signing up
+      if(response.status === 201) {
+        console.log('Signup response:', response.data.newUser)
+
+        // Stores the token for future authorization
+        SecureStore.setItem('token', response.data.token)
+        return
+      }
     } catch(err: any) {
       Alert.alert('Error signing up: ', err.message)
       return
