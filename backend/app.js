@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv')
 
-const userRoutes = require('./routes/userRoutes')
+const authRoutes = require('./routes/authRoutes')
 const authenticateToken = require('./middleware/authMiddleware');
 
 // Global env configuration
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Mount user-related routes at /signup endpoint
-app.use('/', userRoutes);
+app.use('/', authRoutes);
 
 // Mount protected route group
 app.use('/protected', authenticateToken)

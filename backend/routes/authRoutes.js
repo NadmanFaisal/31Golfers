@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const authenticateMiddleware = require('../middleware/authMiddleware');
+const authController = require('../controllers/authController');
+const authenticateToken = require('../middleware/authMiddleware');
+
+// Route: POST /signup
+router.post('/signup', authController.create_user);
+
+// Route: POST /login
+router.post('/login', authController.login_user)
 
 // Route: GET /protected
 router.get('/', authenticateToken, (req, res) => {

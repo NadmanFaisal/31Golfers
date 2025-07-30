@@ -36,7 +36,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-.env
-*/.env
+/app/api/.constants.tsx
 
 app-example

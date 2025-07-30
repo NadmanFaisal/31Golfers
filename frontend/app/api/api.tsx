@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const IP = process.env.IP
+import { IP } from './.constants'
 
 let base =  `http://${IP}:3000`
 
