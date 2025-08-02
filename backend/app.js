@@ -6,7 +6,7 @@ const authRoutes = require('./routes/authRoutes')
 const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
-const { saveCourse, saveDailyForecast, saveHourlyForecasts } = require('./services/weatherService');
+const { saveCourse, saveDailyForecast, saveHourlyForecasts, calculatePlayableHoles } = require('./services/weatherService');
 
 // Global env configuration
 dotenv.config();
@@ -71,6 +71,11 @@ cron.schedule('0 0 0 * * *', fetchAndSaveWeather);
 app.listen(PORT, (error) =>{
     if(!error) {
         console.log("Server is Successfully Running, and App is listening on port "+ PORT);
+        (async () => {
+          const teeOffTime = new Date("2025-08-03T15:30:00");
+          const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
+          console.log(result);
+        })();
     }
     else 
         console.log("Error occurred, server can't start", error);
