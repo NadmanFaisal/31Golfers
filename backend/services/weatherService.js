@@ -142,11 +142,11 @@ async function getHourlyPrecip(courseName, teeOffTime, finishEstimate) {
  * @param {String} courseName Name of the golf course
  * @param {Date} teeOffTime Start time of the game
  * @param {Number} numHoles Number of holes to be played
- * @param {Number} pacePerHole Time taken to play per hole
+ * @param {Number} pperHole Time taken to play per hole
  * @returns 
  */
-async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pacePerHole) {
-  const pacePerHole = pacePerHole; // minutes per hole
+async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole) {
+  const pacePerHole = pperHole; // minutes per hole
 
   // Step 1: Get sunset for today
   const sunset = await getTodaySunset(courseName);
