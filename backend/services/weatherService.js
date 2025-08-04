@@ -209,6 +209,64 @@ function estimatePlayableHoles(teeOffTime, numHoles, pacePerHole, sunset, hourly
   }
 }
 
+/**
+ * Get the date range filter for today, tomorrow, or a specific date.
+ * @param {string} dayParam - "today", "tomorrow", or "YYYY-MM-DD"
+ * @returns {{gte: Date, lt: Date}} MongoDB-compatible date range
+ */
+function getDateRange(dayParam) {
+  let date;
+
+  if (dayParam === "today") {
+    date = new Date();
+  } else if (dayParam === "tomorrow") {
+    date = new Date();
+    date.setDate(date.getDate() + 1);
+  } else {
+    // Parse YYYY-MM-DD format
+    date = new Date(dayParam);
+    if (isNaN(date.getTime())) {
+      throw new Error("Invalid date format. Use 'today', 'tomorrow', or 'YYYY-MM-DD'.");
+    }
+  }
+
+  const start = new Date(date.setHours(0, 0, 0, 0));
+  const end = new Date(start);
+  end.setDate(start.getDate() + 1);
+
+  return { gte: start, lt: end };
+}
+
+/**
+ * Fetch weather for a given golf course and day.
+ * @param {string} golfCourse - Name of the golf course
+ * @param {string} day - "today", "tomorrow", or "YYYY-MM-DD"
+ * @returns {Promise<Object>} The daily forecast with hourly forecasts
+ */
+async function getWeather(golfCourse, day) {
+  console.log("In get weather")
+  if (!golfCourse) throw new Error("golfCourse parameter is required");
+
+  const dateRange = getDateRange(day);
+
+  const daily = await prisma.dailyForecast.findFirst({
+    where: {
+      courseName: golfCourse,
+      date: dateRange
+    },
+    include: {
+      hourlyForecasts: true
+    }
+  });
+
+  if (!daily) {
+    throw new Error(`No forecast found for ${golfCourse} on ${day}`);
+  }
+
+  console.log(daily)
+  return daily;
+}
+
 module.exports = {
   saveCourse,
   saveDailyForecast,
@@ -216,5 +274,6 @@ module.exports = {
   estimatePlayableHoles,
   getTodaySunset,
   getHourlyPrecip,
-  calculatePlayableHoles
+  calculatePlayableHoles,
+  getWeather
 };

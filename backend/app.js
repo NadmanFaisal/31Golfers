@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const cron = require('node-cron')
 
 const authRoutes = require('./routes/authRoutes')
+const weatherRoutes = require("./routes/weatherRoutes")
 const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
@@ -21,6 +22,7 @@ app.use('/', authRoutes);
 
 // Mount protected route group
 app.use('/protected', authenticateToken)
+app.use('/weather', authenticateToken, weatherRoutes)
 
 /**
  * List of golf course locations, stored as a 
@@ -71,11 +73,11 @@ cron.schedule('0 0 0 * * *', fetchAndSaveWeather);
 app.listen(PORT, (error) =>{
     if(!error) {
         console.log("Server is Successfully Running, and App is listening on port "+ PORT);
-        (async () => {
-          const teeOffTime = new Date("2025-08-03T15:30:00");
-          const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
-          console.log(result);
-        })();
+        // (async () => {
+        //   const teeOffTime = new Date("2025-08-03T15:30:00");
+        //   const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
+        //   console.log(result);
+        // })();
     }
     else 
         console.log("Error occurred, server can't start", error);
