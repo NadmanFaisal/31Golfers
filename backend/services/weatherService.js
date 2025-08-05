@@ -245,7 +245,7 @@ function getDateUpperAndLowerRange(dayParam) {
  * @param {string} day - "today", "tomorrow", or "YYYY-MM-DD"
  * @returns {Promise<Object>} The daily forecast with hourly forecasts
  */
-async function getHourlyWeather(golfCourse, day) {
+async function getWeather(golfCourse, day) {
   console.log("In get weather")
   if (!golfCourse) throw new Error("golfCourse parameter is required");
 
@@ -277,5 +277,5 @@ module.exports = {
   getTodaySunset,
   getHourlyPrecip,
   calculatePlayableHoles,
-  getHourlyWeather
+  getWeather
 };
