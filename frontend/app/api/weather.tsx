@@ -7,18 +7,17 @@ import api from "./api";
  * @param day Day's weather that is needed
  * @returns {Promise<any>} Resolves with the weather data object returned from the backend.
  */
-export async function getTodayWeather(
+export async function getHourlyWeatherData(
   token: string,
   golfCourse: string,
   day: Date,
 ) {
   console.log("Token:", token);
   try {
-    const response = await api.get("/weather", {
+    const response = await api.get("/weather/hourlyweather", {
       headers: { Authorization: `Bearer ${token}` },
       params: { golfCourse, day },
     });
-    console.log("API Response Data:", response.data);
     return response.data;
   } catch (err: any) {
     if (err.response) {

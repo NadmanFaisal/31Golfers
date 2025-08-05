@@ -40,6 +40,8 @@ async function saveDailyForecast(courseName, courseId, forecastDay) {
       maxwind_kph: forecastDay.day.maxwind_kph,
       totalprecip_mm: forecastDay.day.totalprecip_mm,
       avghumidity: forecastDay.day.avghumidity,
+      chance_of_rain: forecastDay.day.daily_chance_of_rain,
+      chance_of_snow: forecastDay.day.daily_chance_of_snow,
       uv: forecastDay.day.uv,
 
       // Link forecast to the course
@@ -214,7 +216,7 @@ function estimatePlayableHoles(teeOffTime, numHoles, pacePerHole, sunset, hourly
  * @param {string} dayParam - "today", "tomorrow", or "YYYY-MM-DD"
  * @returns {{gte: Date, lt: Date}} MongoDB-compatible date range
  */
-function getDateRange(dayParam) {
+function getDateUpperAndLowerRange(dayParam) {
   let date;
 
   if (dayParam === "today") {
@@ -243,11 +245,11 @@ function getDateRange(dayParam) {
  * @param {string} day - "today", "tomorrow", or "YYYY-MM-DD"
  * @returns {Promise<Object>} The daily forecast with hourly forecasts
  */
-async function getWeather(golfCourse, day) {
+async function getHourlyWeather(golfCourse, day) {
   console.log("In get weather")
   if (!golfCourse) throw new Error("golfCourse parameter is required");
 
-  const dateRange = getDateRange(day);
+  const dateRange = getDateUpperAndLowerRange(day);
 
   const daily = await prisma.dailyForecast.findFirst({
     where: {
@@ -275,5 +277,5 @@ module.exports = {
   getTodaySunset,
   getHourlyPrecip,
   calculatePlayableHoles,
-  getWeather
+  getHourlyWeather
 };

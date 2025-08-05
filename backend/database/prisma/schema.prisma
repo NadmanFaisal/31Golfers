@@ -42,6 +42,8 @@ model DailyForecast {
   maxwind_kph     Float
   totalprecip_mm  Float
   avghumidity     Float
+  chance_of_rain  Int?
+  chance_of_snow  Int?
   uv              Float
 
   // The ID of the course

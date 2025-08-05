@@ -7,11 +7,11 @@ const weatherService = require('../services/weatherService');
  * @param {Response} res  Express response object.
  * @returns {Promise<void>}
  */
-exports.get_weather = async (req, res) => {
+exports.get_hourly_weather_data = async (req, res) => {
     const golfCourse = req.query.golfCourse;
     const day = req.query.day;
     try {
-        const response = await weatherService.getWeather(golfCourse, day)
+        const response = await weatherService.getHourlyWeather(golfCourse, day)
         return res.status(200).json(response);
     } catch(err) {
         console.error(err);
