@@ -15,3 +15,61 @@ model User {
   username  String
   password  String
 }
+
+// Model for the golf courses
+model GolfCourse {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String          @unique
+  latitude       Float
+  longitude      Float
+  
+  /** 
+  * Relation between golf course and daily forecast, 
+  * 1 GC ----> N dailyForecasts
+  */
+  dailyForecasts DailyForecast[]
+}
+
+model DailyForecast {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  date            DateTime
+
+  // Name of the course
+  courseName      String
+  sunrise         String
+  sunset          String
+  avgtemp_c       Float
+  maxwind_kph     Float
+  totalprecip_mm  Float
+  avghumidity     Float
+  chance_of_rain  Int?
+  chance_of_snow  Int?
+  uv              Float
+
+  // The ID of the course
+  course          GolfCourse       @relation(fields: [courseId], references: [id])
+  courseId        String           @db.ObjectId
+
+  /** 
+  * Relation between hourly and daily forecast, 
+  * 1 DF ----> N HF
+  */
+  hourlyForecasts HourlyForecast[]
+}
+
+model HourlyForecast {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  time             DateTime
+
+  // The course name
+  courseName       String
+  temp_c           Float
+  wind_kph         Float
+  precip_mm        Float
+  humidity         Float
+  uv               Float
+
+  // The ID of the daily forecast
+  dailyForecast    DailyForecast  @relation(fields: [dailyForecastId], references: [id])
+  dailyForecastId  String         @db.ObjectId
+}

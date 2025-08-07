@@ -1,40 +1,57 @@
-import React, { useEffect, useState } from "react";
-import { Button, SafeAreaView, Text } from "react-native";
-import * as SecureStore from 'expo-secure-store';
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import React, { useEffect, useState } from "react";
+import { Text, Button, SafeAreaView, View } from "react-native";
 
-export default function HomeScreen () {
+import styles from "./styles";
+import WeatherTile from "../components/WeatherTile";
 
-    // JWT Token for authorization
-    const [token, setToken] = useState<string | null>('')
+export default function HomeScreen() {
+  const [location, setLocation] = useState("");
 
-    // Fetch the token stored in SecureStore
-    useEffect(() => {
-        const getToken = async () => {
-            const fetchedToken = await SecureStore.getItem('token')
-            if(!fetchedToken) {
-                router.dismissTo('/(auth)/login')
-            }
-            setToken(fetchedToken)
-            console.log('Token:', token)
-        }
-        getToken()
-    }, [token])
+  // JWT Token for authorization
+  const [token, setToken] = useState("");
 
-    const handleLogout = () => {
-        // Deletes the token for new token to be stored
-        SecureStore.deleteItemAsync('token')
-        router.dismissTo('/(auth)/login')
+  const getToken = async () => {
+    const fetchedToken = await SecureStore.getItem("token");
+    if (!fetchedToken) {
+      router.dismissTo("/(auth)/login");
+    } else {
+      setToken(fetchedToken);
     }
-    return (
-        <SafeAreaView>
-            <Text>Hii</Text>
-            <Button
-              onPress={() => handleLogout()}
-              title="Log out"
-              color="#841584"
-              accessibilityLabel="Sign up as a user!"
-            />
-        </SafeAreaView>
-    )
+    console.log("Token:", token);
+  };
+
+  const handleLogout = () => {
+    // Deletes the token for new token to be stored
+    SecureStore.deleteItemAsync("token");
+    router.dismissTo("/(auth)/login");
+  };
+
+  // Fetch the token stored in SecureStore
+  useEffect(() => {
+    getToken();
+  }, []);
+
+  return (
+    <SafeAreaView>
+      <View style={styles.mainContainer}>
+        {/* /////////////////////// Weather Tile Stuff down here ///////////////////////  */}
+
+        <View style={styles.weatherContainer}>
+          <WeatherTile token={token} onLocationChange={setLocation} />
+        </View>
+
+        {/* ///////////////////////  End of weather tile stuff, look above ///////////////////////  */}
+
+        <Text>Location: {location}</Text>
+        <Button
+          onPress={() => handleLogout()}
+          title="Log out"
+          color="#841584"
+          accessibilityLabel="Sign up as a user!"
+        />
+      </View>
+    </SafeAreaView>
+  );
 }
