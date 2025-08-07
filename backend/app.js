@@ -4,6 +4,7 @@ const cron = require('node-cron')
 
 const authRoutes = require('./routes/authRoutes')
 const weatherRoutes = require("./routes/weatherRoutes")
+const locationRoutes = require("./routes/locationRoutes")
 const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
@@ -23,6 +24,7 @@ app.use('/', authRoutes);
 // Mount protected route group
 app.use('/protected', authenticateToken)
 app.use('/weather', authenticateToken, weatherRoutes)
+app.use('/location', authenticateToken, locationRoutes)
 
 /**
  * List of golf course locations, stored as a 
