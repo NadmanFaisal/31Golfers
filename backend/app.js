@@ -5,10 +5,12 @@ const cron = require('node-cron')
 const authRoutes = require('./routes/authRoutes')
 const weatherRoutes = require("./routes/weatherRoutes")
 const locationRoutes = require("./routes/locationRoutes")
+const gameRoutes = require("./routes/gameRoutes")
 const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
-const { saveCourse, saveDailyForecast, saveHourlyForecasts, calculatePlayableHoles } = require('./services/weatherService');
+const { saveCourse, saveDailyForecast, saveHourlyForecasts } = require('./services/weatherService');
+const { calculatePlayableHole } = require("./services/gameService");
 
 // Global env configuration
 dotenv.config();
@@ -25,6 +27,7 @@ app.use('/', authRoutes);
 app.use('/protected', authenticateToken)
 app.use('/weather', authenticateToken, weatherRoutes)
 app.use('/location', authenticateToken, locationRoutes)
+app.use('/game', authenticateToken, gameRoutes);
 
 /**
  * List of golf course locations, stored as a 
@@ -77,12 +80,12 @@ app.listen(PORT, (error) =>{
     if(!error) {
         console.log("Server is Successfully Running, and App is listening on port "+ PORT);
         // (async () => {
-        //   const teeOffTime = new Date("2025-08-03T15:30:00");
+        //   const teeOffTime = new Date("2025-08-11T15:30:00");
         //   const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
         //   console.log(result);
         // })();
     }
     else 
-        console.log("Error occurred, server can't start", error);
+      console.log("Error occurred, server can't start", error);
     }
 );
