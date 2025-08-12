@@ -1,10 +1,19 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
-import { Text, Button, SafeAreaView, View } from "react-native";
+import {
+  Text,
+  Button,
+  SafeAreaView,
+  View,
+  Image,
+  ScrollView,
+} from "react-native";
 
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
+import RecommendedTile from "../components/RecommendedTile";
+
 import { getAllLocations } from "../api/location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getWeather } from "../api/weather";
@@ -25,6 +34,8 @@ export default function HomeScreen() {
 
   const [recommendedGame, setRecommendedGame] = useState<any>(null);
 
+  const [otherGames, pushOtherGames] = useState<any>([]);
+
   const getToken = async () => {
     const fetchedToken = await SecureStore.getItemAsync("token");
     if (!fetchedToken) {
@@ -44,24 +55,23 @@ export default function HomeScreen() {
   const getAllLocationsObjects = async () => {
     try {
       const response = await getAllLocations(token);
-      const formattedData = response.data.map((gc: any) => ({
+      const formatted = response.data.map((gc: any) => ({
         label: gc.name,
         value: gc.id,
         latitude: gc.latitude,
         longitude: gc.longitude,
       }));
+      setGolfCourses(formatted);
 
-      setGolfCourses(formattedData);
-
-      const loc = await AsyncStorage.getItem("Location");
-      if (loc) {
-        setLocation(loc); // <-- set state when we already have a saved value
-      } else if (formattedData.length > 0) {
-        const defaultLocation = formattedData[0].label;
-        await setNewLocation(defaultLocation); // sets AsyncStorage + state
+      // restore last chosen location or set default
+      const saved = await AsyncStorage.getItem("Location");
+      if (saved) {
+        setLocation(saved);
+      } else if (formatted.length > 0) {
+        await setNewLocation(formatted[0].label);
       }
 
-      console.log("Dropdown-ready locations: ", formattedData);
+      console.log("Dropdown-ready locations: ", formatted);
     } catch (err) {
       console.error("Error in getAllLocationsObject:", err);
     }
@@ -131,6 +141,7 @@ export default function HomeScreen() {
       );
 
       setRecommendedGame(response);
+      console.log("Recommended game: ", response);
     } catch (err: any) {
       console.error("Error in getRecommendedGame:", err);
     }
@@ -195,19 +206,32 @@ export default function HomeScreen() {
             currentWeather={currentWeather}
             weather={weather}
             token={token}
+            location={location}
             onLocationChange={setNewLocation}
           />
         </View>
 
         {/* ///////////////////////  End of weather tile stuff, look above ///////////////////////  */}
 
-        <Text>Location: {location}</Text>
-        <Button
-          onPress={() => handleLogout()}
-          title="Log out"
-          color="#841584"
-          accessibilityLabel="Sign up as a user!"
-        />
+        <View style={styles.selectionContainer}>
+          <Text>Location: {location}</Text>
+        </View>
+
+        <ScrollView>
+          <View style={styles.recommendedTitleContainer}>
+            <Text style={styles.recommendedTitleLabel}>Recommended</Text>
+          </View>
+          <RecommendedTile recommendedGame={recommendedGame} />
+        </ScrollView>
+
+        <View style={styles.footerNavigationContainer}>
+          <Button
+            onPress={() => handleLogout()}
+            title="Log out"
+            color="#841584"
+            accessibilityLabel="Sign up as a user!"
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

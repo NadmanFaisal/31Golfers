@@ -12,6 +12,7 @@ type WeatherProps = {
   golfCourses: any;
   currentWeather: any;
   weather: any;
+  location: string;
   onLocationChange?: (location: string) => void;
 };
 
@@ -19,23 +20,7 @@ export default function WeatherTile(props: WeatherProps) {
   // List of all the golf courses
 
   // Drop down menu's selections
-  const [location, setLocation] = useState("");
   const [isFocus, setIsFocus] = useState(false);
-
-  /**
-   * Needed to  show the location in the dropdown selection when
-   * the app loads for the first time.
-   */
-  const getCurrentLocation = async () => {
-    const fetchedLocation = await AsyncStorage.getItem("Location");
-    if (fetchedLocation) {
-      setLocation(fetchedLocation);
-    }
-  };
-
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
 
   return (
     <View style={styles.weatherContainer}>
@@ -52,7 +37,7 @@ export default function WeatherTile(props: WeatherProps) {
             maxHeight={300}
             labelField="label"
             valueField="value"
-            placeholder={location ? location : "Select location"}
+            placeholder={props.location ? props.location : "Select location"}
             searchPlaceholder="Search..."
             value={location}
             onFocus={() => setIsFocus(true)}

@@ -20,6 +20,17 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
   // Step 1: Get sunset for today
   const sunset = await getTodaySunset(courseName);
 
+  // If the start time is at or after sunset, then there is no recommendation
+  if (teeOffTime >= sunset) {
+    return {
+      courseName,
+      teeOffTime,
+      playableHoles: 0,
+      finishTime: teeOffTime,
+      gameTime: 0
+    };
+  }
+
   // Step 2: Get baseline finish time (no weather)
   const baselineMinutes = numHoles * pacePerHole;
   const baselineFinish = new Date(teeOffTime.getTime() + baselineMinutes * 60000);
@@ -61,5 +72,5 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
 }
 
 module.exports = {
-    calculatePlayableHoles
+  calculatePlayableHoles
 }
