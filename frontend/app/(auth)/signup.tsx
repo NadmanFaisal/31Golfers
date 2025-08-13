@@ -1,7 +1,7 @@
-import { SafeAreaView, View, Text, Image, Button, Alert } from "react-native";
+import { SafeAreaView, View, Text, Image, Alert } from "react-native";
 import { useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 
 import styles from "./styles";
 import { signupUser } from "../api/auth";
