@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Text,
   Button,
@@ -13,6 +13,7 @@ import {
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
 import RecommendedTile from "../components/RecommendedTile";
+import { TeeOffButton } from "../components/Buttons";
 
 import { getAllLocations } from "../api/location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,6 +21,11 @@ import { getWeather } from "../api/weather";
 import { getRecommendedGameSession } from "../api/game";
 
 export default function HomeScreen() {
+  // The start time for getting recommended game
+  const [teeOffTime, setTeeOffTime] = useState<Date>(new Date());
+
+  // The location (golfCourse) where the recommended game
+  // is to be fetched
   const [location, setLocation] = useState("");
 
   // JWT Token for authorization
@@ -33,12 +39,8 @@ export default function HomeScreen() {
   // Current hour's weather
   const [currentWeather, setCurrentWeather] = useState<any>(null);
 
-  // Variable to keep track of recommended game, fetched from the backend 
+  // Variable to keep track of recommended game, fetched from the backend
   const [recommendedGame, setRecommendedGame] = useState<any>(null);
-
-  // Variable to store other recommended games fetched from the B.E. 
-  const [otherGames, pushOtherGames] = useState<any>([]);
-
 
   const getToken = async () => {
     const fetchedToken = await SecureStore.getItemAsync("token");
@@ -48,6 +50,11 @@ export default function HomeScreen() {
       setToken(fetchedToken);
     }
     console.log("Token:", token);
+  };
+
+  // Updates the time variable from the child component
+  const handleTimeSelected = (d: Date) => {
+    setTeeOffTime(d);
   };
 
   const handleLogout = () => {
@@ -87,18 +94,17 @@ export default function HomeScreen() {
    * and sets the new location string.
    * Also updates the `location` state variable, which is used by other hooks/components.
    * @param {string} location The new location value.
-  */
+   */
   const setNewLocation = async (location: string) => {
     await AsyncStorage.removeItem("Location");
     await AsyncStorage.setItem("Location", location);
     setLocation(location);
   };
 
-
-  /** 
-   * Fetches weather data for the stored location and updates 
+  /**
+   * Fetches weather data for the stored location and updates
    * local state.
-  */
+   */
   const getWeatherObjects = async () => {
     try {
       const fetchedLocation = await AsyncStorage.getItem("Location");
@@ -129,8 +135,8 @@ export default function HomeScreen() {
    * Retrieves the weather forecast for the current hour from the stored weather data.
    * @function getCurrentHourWeather
    * @returns {void}
-   * 
-  */
+   *
+   */
   const getCurrentHourWeather = () => {
     if (!weather?.hourlyForecasts?.length) return;
 
@@ -153,11 +159,12 @@ export default function HomeScreen() {
    * Fetches a recommended game session from the API and updates local state.
    * @function getRecommendedGame
    * @returns {Promise<void>}
-   * 
-  */
+   *
+   */
   const getRecommendedGame = async () => {
     try {
-      const teeOffTime = new Date();
+      if (!teeOffTime) return;
+
       console.log("Tee off time: ", teeOffTime);
       const response = await getRecommendedGameSession(
         token,
@@ -177,7 +184,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!token || !location) return;
     getRecommendedGame();
-  }, [token, location]);
+  }, [token, location, teeOffTime]);
 
   // Fetch weather data from the backend according to location and date
   useEffect(() => {
@@ -185,7 +192,7 @@ export default function HomeScreen() {
     getWeatherObjects();
   }, [token, location]);
 
-  // Runs every hour to get weather data 
+  // Runs every hour to get weather data
   useEffect(() => {
     const run = () => getCurrentHourWeather();
 
@@ -242,17 +249,27 @@ export default function HomeScreen() {
         {/* ///////////////////////  End of weather tile stuff, look above ///////////////////////  */}
 
         <View style={styles.selectionContainer}>
-          <Text>Location: {location}</Text>
+          <View style={styles.upperSelectionContainer}>
+            <TeeOffButton
+              height={75}
+              width={350}
+              color="#ff8e31ff"
+              pressedColor="#e46600ff"
+              text="Set Tee Off time"
+              onTimeSelected={handleTimeSelected}
+            />
+          </View>
+          <View style={styles.lowerSelectionContainer}></View>
         </View>
 
-        <ScrollView>
+        <View style={styles.gameRecommendationContainer}>
           <View style={styles.recommendedTitleContainer}>
             <Text style={styles.recommendedTitleLabel}>Recommended</Text>
+            {/* <Text>Location: {location}</Text>
+            <Text>Time: {teeOffTime?.toString()}</Text> */}
           </View>
           <RecommendedTile recommendedGame={recommendedGame} />
-        </ScrollView>
 
-        <View style={styles.footerNavigationContainer}>
           <Button
             onPress={() => handleLogout()}
             title="Log out"
@@ -260,6 +277,8 @@ export default function HomeScreen() {
             accessibilityLabel="Sign up as a user!"
           />
         </View>
+
+        <View style={styles.footerNavigationContainer}></View>
       </View>
     </SafeAreaView>
   );

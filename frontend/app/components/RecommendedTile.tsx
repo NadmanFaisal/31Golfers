@@ -39,7 +39,7 @@ export default function RecommendedTile(props: RecommendedProps) {
         <View style={styles.informationLabelContainer}>
           <Image
             style={styles.informationPicture}
-            source={require("../../assets/images/clock_icon.png")}
+            source={require("../../assets/images/black_clock_icon.png")}
             resizeMode="contain"
           />
           <Text style={styles.gameInformationLabel}>
