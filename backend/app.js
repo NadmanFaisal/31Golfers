@@ -74,7 +74,7 @@ async function fetchAndSaveWeather() {
  * everyday. 
  */
 
-cron.schedule('0 0 0 * * *', fetchAndSaveWeather);
+cron.schedule('0 0 0 * * *', fetchAndSaveWeather, {timezone: "Asia/Dhaka"});
 
 app.listen(PORT, (error) =>{
     if(!error) {

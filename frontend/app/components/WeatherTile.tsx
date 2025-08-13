@@ -1,7 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { getAllLocations } from "../api/location";
-import { getWeather } from "../api/weather";
+import React, { useState } from "react";
 import { View, Text, Image } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 

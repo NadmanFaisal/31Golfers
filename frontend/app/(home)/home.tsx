@@ -1,14 +1,7 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  Text,
-  Button,
-  SafeAreaView,
-  View,
-  Image,
-  ScrollView,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, Button, SafeAreaView, View } from "react-native";
 
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
