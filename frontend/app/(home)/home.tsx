@@ -29,12 +29,16 @@ export default function HomeScreen() {
 
   // The whole weather obj fetched from the backend
   const [weather, setWeather] = useState<any>(null);
+
   // Current hour's weather
   const [currentWeather, setCurrentWeather] = useState<any>(null);
 
+  // Variable to keep track of recommended game, fetched from the backend 
   const [recommendedGame, setRecommendedGame] = useState<any>(null);
 
+  // Variable to store other recommended games fetched from the B.E. 
   const [otherGames, pushOtherGames] = useState<any>([]);
+
 
   const getToken = async () => {
     const fetchedToken = await SecureStore.getItemAsync("token");
@@ -77,12 +81,24 @@ export default function HomeScreen() {
     }
   };
 
+  /**
+   * Updates the stored "Location" value in AsyncStorage and the local state.
+   * Removes the existing "Location" entry (optional, as setItem overwrites)
+   * and sets the new location string.
+   * Also updates the `location` state variable, which is used by other hooks/components.
+   * @param {string} location The new location value.
+  */
   const setNewLocation = async (location: string) => {
     await AsyncStorage.removeItem("Location");
     await AsyncStorage.setItem("Location", location);
     setLocation(location);
   };
 
+
+  /** 
+   * Fetches weather data for the stored location and updates 
+   * local state.
+  */
   const getWeatherObjects = async () => {
     try {
       const fetchedLocation = await AsyncStorage.getItem("Location");
@@ -109,6 +125,12 @@ export default function HomeScreen() {
     }
   };
 
+  /**
+   * Retrieves the weather forecast for the current hour from the stored weather data.
+   * @function getCurrentHourWeather
+   * @returns {void}
+   * 
+  */
   const getCurrentHourWeather = () => {
     if (!weather?.hourlyForecasts?.length) return;
 
@@ -127,7 +149,12 @@ export default function HomeScreen() {
       console.warn("No forecast found for current hour");
     }
   };
-
+  /**
+   * Fetches a recommended game session from the API and updates local state.
+   * @function getRecommendedGame
+   * @returns {Promise<void>}
+   * 
+  */
   const getRecommendedGame = async () => {
     try {
       const teeOffTime = new Date();
@@ -158,6 +185,7 @@ export default function HomeScreen() {
     getWeatherObjects();
   }, [token, location]);
 
+  // Runs every hour to get weather data 
   useEffect(() => {
     const run = () => getCurrentHourWeather();
 

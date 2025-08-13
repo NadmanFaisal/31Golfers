@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 const { getTodaySunset, getHourlyPrecip } = require("./weatherService");
 
-
 /**
  * Calculates the playable hours in a course given the 
  * start tee off time, and the number of holes the 
@@ -43,7 +42,7 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
   );
 
   // Step 4: Run our playable holes estimate
-  
+
   // Filter relevant hours again (safety)
   const relevantHours = hourlyPrecipData.filter(h =>
     h.time >= teeOffTime && h.time <= sunset
@@ -59,7 +58,7 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
   // Step 6: Calculate adjusted finish
   const adjustedMinutes = numHoles * pacePerHole * delayFactor;
   const adjustedFinish = new Date(teeOffTime.getTime() + adjustedMinutes * 60000);
-  
+
   if (adjustedFinish <= sunset) {
     const durationOfGame = (adjustedFinish.getTime() - teeOffTime.getTime()) / 60000;
     return { coursename: courseName, teeofftime: teeOffTime, playableHoles: numHoles, finishTime: adjustedFinish, gameTime: durationOfGame };

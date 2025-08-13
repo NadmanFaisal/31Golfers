@@ -7,7 +7,20 @@ type RecommendedProps = {
 };
 
 export default function RecommendedTile(props: RecommendedProps) {
-  return props.recommendedGame ? (
+  if (!props.recommendedGame) return null;
+
+  if (
+    props.recommendedGame.playableHoles === 0 ||
+    props.recommendedGame.gameTime === 0
+  ) {
+    return (
+      <View style={styles.recommendedGameContainer}>
+        <Text style={styles.holesLabel}>No recommendation</Text>
+      </View>
+    );
+  }
+
+  return (
     <View style={styles.recommendedGameContainer}>
       <View style={styles.pictureContainer}>
         <Image
@@ -19,7 +32,7 @@ export default function RecommendedTile(props: RecommendedProps) {
       <View style={styles.informationContainer}>
         <View style={styles.holeLabelContainer}>
           <Text style={styles.holesLabel}>
-            {props.recommendedGame.playableHoles} hole(s)
+            {props.recommendedGame.playableHoles ?? "Loading..."} hole(s)
           </Text>
         </View>
 
@@ -30,7 +43,7 @@ export default function RecommendedTile(props: RecommendedProps) {
             resizeMode="contain"
           />
           <Text style={styles.gameInformationLabel}>
-            {props.recommendedGame.gameTime} mins
+            {props.recommendedGame.gameTime ?? "Loading..."} mins
           </Text>
         </View>
 
@@ -41,12 +54,12 @@ export default function RecommendedTile(props: RecommendedProps) {
             resizeMode="contain"
           />
           <Text style={styles.gameInformationLabel}>
-            {props.recommendedGame.courseName}
+            {props.recommendedGame.coursename ?? "Loading..."}
           </Text>
         </View>
       </View>
 
       <View style={styles.createGameContainer}></View>
     </View>
-  ) : null;
+  );
 }

@@ -1,5 +1,13 @@
 import api from "./api";
 
+/**
+ * Sends a signup request to the API with the provided user details.
+ * @param {string} email User's email address.
+ * @param {string} username Desired username for the account.
+ * @param {string} password User's chosen password.
+ * @returns {Promise<Object>} API response object.
+ * @throws {Error} If signup fails, throws an error with a descriptive message.
+ */
 export async function signupUser(
   email: string,
   username: string,
@@ -21,6 +29,13 @@ export async function signupUser(
   }
 }
 
+/**
+ * Sends a login request to the API with the provided credentials.
+ * @param {string} email User's email address.
+ * @param {string} password User's account password.
+ * @returns {Promise<Object>} API response object.
+ * @throws {Error} If login fails, throws an error with a descriptive message.
+ */
 export async function loginUser(email: string, password: string) {
   try {
     const response = await api.post("/login", {
@@ -37,17 +52,3 @@ export async function loginUser(email: string, password: string) {
   }
 }
 
-// export async function validateToken(token: string) {
-//   try {
-//     const response = await api.get('/protected', {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     return response.status === 200
-//   } catch (error) {
-//     console.error('Token validation failed:', error);
-//     return false;
-//   }
-// }
