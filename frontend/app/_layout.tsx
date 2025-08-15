@@ -1,35 +1,121 @@
-import { Stack } from "expo-router";
+import { Href, Stack, useRouter, useSegments } from "expo-router";
+import { useState } from "react";
+import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function RootLayout() {
+  // Responsible for not showing the footer in
+  // login and signup screens
+  const segments = useSegments();
+  const showFooter = segments[0] !== "(auth)";
+
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
+    <View style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
           headerShown: false,
         }}
-      />
-      <Stack.Screen
-        name="(auth)/signup"
-        options={{
-          headerTitle: "",
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(auth)/login"
-        options={{
-          headerTitle: "",
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(home)/home"
-        options={{
-          headerTitle: "",
-          headerShown: false,
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)/signup" />
+        <Stack.Screen name="(auth)/login" />
+        <Stack.Screen name="(home)/home" />
+        <Stack.Screen name="settings" />
+      </Stack>
+
+      {showFooter && <Footer />}
+    </View>
   );
 }
+
+function Footer() {
+  // Keep track of current route to not re-enter the same screen
+  // Set to home as this is the first screen after login/signup
+  const [currentRoute, setCurrentRoute] = useState("/(home)/home");
+  const router = useRouter();
+
+  /**
+   * Changes screen (ex: home -> settings)
+   * @param path The destination screen path
+   */
+  const changeScreen = (path: Href) => {
+    // Changes screen if the destination is not the same as current
+    // path
+    if (currentRoute !== path.toString()) {
+      setCurrentRoute(path.toString());
+      router.replace(path);
+    }
+  };
+
+  return (
+    <View style={styles.footerContainer}>
+      <TouchableOpacity
+        onPress={() => changeScreen("/(home)/home")}
+        style={styles.navButton}
+      >
+        <Image
+          style={styles.navLogo}
+          source={require("../assets/images/home_icon.png")}
+          resizeMode="contain"
+        />
+        <Text style={styles.navText}>Home</Text>
+      </TouchableOpacity>
+
+      {/* <TouchableOpacity
+        onPress={() => router.replace("/(game)/game")}
+        style={styles.navButton}
+      >
+        <Image
+          style={styles.navLogo}
+          source={require("../assets/images/game_icon.png")}
+          resizeMode="contain"
+        />
+        <Text style={styles.navText}>Game</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => router.replace("/(settings)/settings")}
+        style={styles.navButton}
+      >
+        <Image
+          style={styles.navLogo}
+          source={require("../assets/images/settings_icon.png")}
+          resizeMode="contain"
+        />
+        <Text style={styles.navText}>Settings</Text>
+      </TouchableOpacity> */}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  footerContainer: {
+    display: "flex",
+    flexDirection: "row",
+    height: "10%",
+    width: "100%",
+    backgroundColor: "#0FBE41",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  navButton: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    width: "25%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  navLogo: {
+    height: "30%",
+    width: "30%",
+  },
+  navText: {
+    fontSize: 14,
+    padding: 5,
+    color: "white",
+  },
+  activeText: {
+    fontWeight: "bold",
+    opacity: 1,
+  },
+});

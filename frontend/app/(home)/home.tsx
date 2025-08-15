@@ -50,9 +50,10 @@ export default function HomeScreen() {
     setTeeOffTime(d);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Deletes the token for new token to be stored
     SecureStore.deleteItemAsync("token");
+    await AsyncStorage.removeItem("Location");
     router.dismissTo("/(auth)/login");
   };
 
@@ -224,7 +225,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.mainContainer}>
       <View style={styles.mainContainer}>
         {/* /////////////////////// Weather Tile Stuff down here ///////////////////////  */}
 
@@ -270,8 +271,6 @@ export default function HomeScreen() {
             accessibilityLabel="Sign up as a user!"
           />
         </View>
-
-        <View style={styles.footerNavigationContainer}></View>
       </View>
     </SafeAreaView>
   );
