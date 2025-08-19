@@ -19,6 +19,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)/signup" />
         <Stack.Screen name="(auth)/login" />
         <Stack.Screen name="(home)/home" />
+        <Stack.Screen name="(game)/game" />
         <Stack.Screen name="settings" />
       </Stack>
 
@@ -60,8 +61,8 @@ function Footer() {
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
 
-      {/* <TouchableOpacity
-        onPress={() => router.replace("/(game)/game")}
+      <TouchableOpacity
+        onPress={() => changeScreen("/(game)/game")}
         style={styles.navButton}
       >
         <Image
@@ -73,7 +74,7 @@ function Footer() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => router.replace("/(settings)/settings")}
+        onPress={() => changeScreen("/(settings)/settings")}
         style={styles.navButton}
       >
         <Image
@@ -82,7 +83,7 @@ function Footer() {
           resizeMode="contain"
         />
         <Text style={styles.navText}>Settings</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </View>
   );
 }

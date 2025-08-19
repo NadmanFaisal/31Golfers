@@ -74,18 +74,18 @@ async function fetchAndSaveWeather() {
  * everyday. 
  */
 
-cron.schedule('0 0 0 * * *', fetchAndSaveWeather, {timezone: "Asia/Dhaka"});
+cron.schedule('0 0 0 * * *', fetchAndSaveWeather, { timezone: "Asia/Dhaka" });
 
-app.listen(PORT, (error) =>{
-    if(!error) {
-        console.log("Server is Successfully Running, and App is listening on port "+ PORT);
-        // (async () => {
-        //   const teeOffTime = new Date("2025-08-11T15:30:00");
-        //   const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
-        //   console.log(result);
-        // })();
-    }
-    else 
-      console.log("Error occurred, server can't start", error);
-    }
+app.listen(PORT, (error) => {
+  if (!error) {
+    console.log("Server is Successfully Running, and App is listening on port " + PORT);
+    // (async () => {
+    //   const teeOffTime = new Date("2025-08-11T15:30:00");
+    //   const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
+    //   console.log(result);
+    // })();
+  }
+  else
+    console.log("Error occurred, server can't start", error);
+}
 );
