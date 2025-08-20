@@ -66,6 +66,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  createGameButton: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 50,
+    backgroundColor: "#0FBE41",
+  },
+  createGameLogo: {
+    height: "50%",
+    width: "50%",
+  },
 });
 
 export default styles;

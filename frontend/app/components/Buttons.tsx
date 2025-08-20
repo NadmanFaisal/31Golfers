@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Image, Text, Pressable, View, Modal } from "react-native";
+import { Image, Text, Pressable, View, Modal, Button } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
 import styles from "./ButtonStyles";
+import { router } from "expo-router";
 
 type buttonProp = {
   height?: number;
@@ -37,6 +38,79 @@ export const AuthorizationButton = (props: buttonProp) => {
         {props.text}
       </Text>
     </Pressable>
+  );
+};
+
+export const CreateGameButton = (props: buttonProp) => {
+  // Controls the visibility of Modal
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Takes place on confirmation, for creating game
+  const onDone = () => {
+    setModalVisible(false);
+  };
+
+  return (
+    <>
+      <Pressable
+        style={({ pressed }) => [
+          styles.createGameButton,
+          {
+            height: props.height ?? "100%",
+            width: props.width ?? "100%",
+            backgroundColor: pressed
+              ? props.pressedColor
+              : (props.color ?? "#999999ff"),
+          },
+        ]}
+        onPress={() => {
+          // Navigates to the game screen, where the game will show
+          router.push("/game");
+          setModalVisible(true);
+        }}
+      >
+        <Image
+          style={styles.createGameLogo}
+          source={require("../../assets/images/create_game_icon.png")}
+          resizeMode="contain"
+        />
+      </Pressable>
+
+      {/* Modal for creating a game */}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={styles.confirmationButton}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}
+              >
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.confirmationButton}
+                onPress={() => {
+                  onDone();
+                }}
+              >
+                <Text style={styles.textStyle}>Done</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 };
 

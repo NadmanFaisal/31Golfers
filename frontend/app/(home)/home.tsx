@@ -50,13 +50,6 @@ export default function HomeScreen() {
     setTeeOffTime(d);
   };
 
-  const handleLogout = async () => {
-    // Deletes the token for new token to be stored
-    SecureStore.deleteItemAsync("token");
-    await AsyncStorage.removeItem("Location");
-    router.dismissTo("/(auth)/login");
-  };
-
   const getAllLocationsObjects = async () => {
     try {
       const response = await getAllLocations(token);
@@ -263,13 +256,6 @@ export default function HomeScreen() {
             <Text>Time: {teeOffTime?.toString()}</Text> */}
           </View>
           <RecommendedTile recommendedGame={recommendedGame} />
-
-          <Button
-            onPress={() => handleLogout()}
-            title="Log out"
-            color="#841584"
-            accessibilityLabel="Sign up as a user!"
-          />
         </View>
       </View>
     </SafeAreaView>

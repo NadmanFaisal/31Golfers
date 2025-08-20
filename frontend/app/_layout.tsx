@@ -1,4 +1,4 @@
-import { Href, Stack, useRouter, useSegments } from "expo-router";
+import { Href, Stack, usePathname, useRouter, useSegments } from "expo-router";
 import { useState } from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 
@@ -33,24 +33,26 @@ function Footer() {
   // Set to home as this is the first screen after login/signup
   const [currentRoute, setCurrentRoute] = useState("/(home)/home");
   const router = useRouter();
+  const pathname = usePathname();
 
   /**
    * Changes screen (ex: home -> settings)
    * @param path The destination screen path
    */
   const changeScreen = (path: Href) => {
-    // Changes screen if the destination is not the same as current
-    // path
-    if (currentRoute !== path.toString()) {
-      setCurrentRoute(path.toString());
-      router.replace(path);
+    // Get the path from expo router, and
+    // prevent re-entering to the same screen.
+    // pathName helps to keep consistent if navigation
+    // is done without the footer bar
+    if (pathname !== path) {
+      router.replace(path); // `path` stays typed as Href
     }
   };
 
   return (
     <View style={styles.footerContainer}>
       <TouchableOpacity
-        onPress={() => changeScreen("/(home)/home")}
+        onPress={() => changeScreen("/home")}
         style={styles.navButton}
       >
         <Image
@@ -62,7 +64,7 @@ function Footer() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => changeScreen("/(game)/game")}
+        onPress={() => changeScreen("/game")}
         style={styles.navButton}
       >
         <Image
@@ -74,7 +76,7 @@ function Footer() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => changeScreen("/(settings)/settings")}
+        onPress={() => changeScreen("/settings")}
         style={styles.navButton}
       >
         <Image
