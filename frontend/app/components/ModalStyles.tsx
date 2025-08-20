@@ -1,32 +1,6 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  authorizationButton: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 5,
-    borderRadius: 15,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontFamily: "Barlow Condensed",
-    fontStyle: "normal",
-    fontWeight: 500,
-  },
-  teeOffButton: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 5,
-    borderRadius: 15,
-  },
-  teeoffLogo: {
-    height: "45%",
-    width: "15%",
-  },
   centeredView: {
     display: "flex",
     flexDirection: "column",
@@ -65,18 +39,6 @@ const styles = StyleSheet.create({
     color: "#275b97ff",
     fontWeight: "bold",
     textAlign: "center",
-  },
-  createGameCircleButton: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 50,
-    backgroundColor: "#0FBE41",
-  },
-  createGameLogo: {
-    height: "50%",
-    width: "50%",
   },
 });
 

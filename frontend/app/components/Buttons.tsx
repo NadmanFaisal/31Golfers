@@ -6,6 +6,7 @@ import DateTimePicker, {
 
 import styles from "./ButtonStyles";
 import { router } from "expo-router";
+import { SelectTeeOffTimeButton, CreateGameModal } from "./Modals";
 
 type buttonProp = {
   height?: number;
@@ -41,7 +42,7 @@ export const AuthorizationButton = (props: buttonProp) => {
   );
 };
 
-export const CreateGameButton = (props: buttonProp) => {
+export const CreateGameCircleButton = (props: buttonProp) => {
   // Controls the visibility of Modal
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -54,7 +55,7 @@ export const CreateGameButton = (props: buttonProp) => {
     <>
       <Pressable
         style={({ pressed }) => [
-          styles.createGameButton,
+          styles.createGameCircleButton,
           {
             height: props.height ?? "100%",
             width: props.width ?? "100%",
@@ -77,39 +78,11 @@ export const CreateGameButton = (props: buttonProp) => {
       </Pressable>
 
       {/* Modal for creating a game */}
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={styles.confirmationButton}
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.confirmationButton}
-                onPress={() => {
-                  onDone();
-                }}
-              >
-                <Text style={styles.textStyle}>Done</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <CreateGameModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onDone={onDone}
+      />
     </>
   );
 };
@@ -165,46 +138,13 @@ export const TeeOffButton = (props: buttonProp) => {
 
       {/* Modal view allows users to select time */}
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={styles.confirmationButton}
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.confirmationButton}
-                onPress={() => {
-                  onDone();
-                }}
-              >
-                <Text style={styles.textStyle}>Done</Text>
-              </Pressable>
-            </View>
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="spinner"
-              themeVariant="light"
-              onChange={onChange}
-              style={{ alignSelf: "center" }}
-            />
-          </View>
-        </View>
-      </Modal>
+      <SelectTeeOffTimeButton
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onDone={onDone}
+        time={time}
+        onChange={onChange}
+      />
     </>
   );
 };
