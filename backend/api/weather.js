@@ -20,6 +20,11 @@ exports.get_weather = async (lat, lon, days) => {
     );
     return response
   } catch (error) {
-    console.error(`Error fetching weather for ${locationName}:`, error.message);
+    const status = error.response?.status;
+    const msg = error.response?.data?.error?.message || error.message;
+    console.error(
+      `Error fetching weather for lat=${lat}, lon=${lon} (status=${status}): ${msg}`
+    );
+    throw error; // keep rethrowing so upstream can handle/log per course
   }
 }

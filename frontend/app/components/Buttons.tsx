@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Image, Text, Pressable, View, Modal, Button } from "react-native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import { Image, Text, Pressable } from "react-native";
+import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
 import styles from "./ButtonStyles";
 import { router } from "expo-router";
@@ -143,7 +141,7 @@ export const TeeOffButton = (props: buttonProp) => {
         setModalVisible={setModalVisible}
         onDone={onDone}
         time={time}
-        onChange={onChange}
+        onDateChange={onChange}
       />
     </>
   );

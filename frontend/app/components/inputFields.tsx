@@ -28,3 +28,28 @@ export const AuthorizationInputField = (props: AuthorizationInputProp) => {
     />
   );
 };
+
+type InputProp = {
+  input: string;
+  handleChange: (text: string) => void;
+  placeholderText?: string;
+};
+
+export const InputField = (props: InputProp) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  return (
+    <TextInput
+      style={[
+        styles.inputField,
+        { borderColor: isFocused ? "#0FBE41" : "#a0a0a0ff" },
+      ]}
+      placeholder={props.placeholderText ?? "text"}
+      placeholderTextColor={"#d4d4d4ff"}
+      value={props.input}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      onChangeText={props.handleChange}
+    />
+  );
+};
