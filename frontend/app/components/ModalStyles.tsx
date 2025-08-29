@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import codegenNativeCommands from "react-native/Libraries/Utilities/codegenNativeCommands";
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -35,9 +36,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 15,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
-  buttonContainer: {
+  confirmationContainer: {
     display: "flex",
     flexDirection: "row",
     height: "20%",
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  gameCreateButtonContainer: {
+  gameCreateConfirmationContainer: {
     display: "flex",
     flexDirection: "row",
     height: "10%",
@@ -53,7 +54,67 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-
+  gameCreatePlayerInfoContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "30%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+  },
+  playerInfoLabel: {
+    color: "#666",
+    fontSize: 24,
+    fontStyle: "normal",
+    fontWeight: 500,
+  },
+  gameCreateLabelContainer: {
+    display: "flex",
+    height: "20%",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  gameCreateDividedContaier: {
+    display: "flex",
+    height: "80%",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playerLabel: {
+    color: "#666",
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: 400,
+  },
+  gameCreateLeftContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    width: "50%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gameCreateRightContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    width: "50%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gameCreateButtonContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "25%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   confirmationButton: {
     display: "flex",
     flexDirection: "column",

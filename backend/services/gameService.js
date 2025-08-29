@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const { getTodaySunset, getHourlyPrecip } = require("./weatherService");
+const { getTodaySunset, getHourlyPrecip, getTodaySunrise } = require("./weatherService");
 
 /**
  * Calculates the playable hours in a course given the 
@@ -16,11 +16,12 @@ const { getTodaySunset, getHourlyPrecip } = require("./weatherService");
 async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole) {
   const pacePerHole = pperHole; // minutes per hole
 
-  // Step 1: Get sunset for today
+  // Step 1: Get sunset and sunrise data for today
   const sunset = await getTodaySunset(courseName);
+  const sunrise = await getTodaySunrise(courseName);
 
   // If the start time is at or after sunset, then there is no recommendation
-  if (teeOffTime >= sunset) {
+  if (teeOffTime >= sunset || teeOffTime <= sunrise || sunrise >= sunset) {
     return {
       courseName,
       teeOffTime,

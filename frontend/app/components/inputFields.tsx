@@ -33,6 +33,8 @@ type InputProp = {
   input: string;
   handleChange: (text: string) => void;
   placeholderText?: string;
+  width?: number;
+  height?: number;
 };
 
 export const InputField = (props: InputProp) => {
@@ -43,6 +45,8 @@ export const InputField = (props: InputProp) => {
       style={[
         styles.inputField,
         { borderColor: isFocused ? "#0FBE41" : "#a0a0a0ff" },
+        { height: props.height ?? 40 },
+        { width: props.width ?? "100%" },
       ]}
       placeholder={props.placeholderText ?? "text"}
       placeholderTextColor={"#d4d4d4ff"}
