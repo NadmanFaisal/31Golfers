@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, Modal, Pressable, View } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
@@ -7,22 +7,40 @@ import styles from "./ModalStyles";
 import HoleSelector from "./HoleSelector";
 import { InputField } from "./inputFields";
 import { CreateGamenButton } from "./Buttons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { createOfflineGame } from "../database/offlineGameStore";
+import { useNavigation } from "@react-navigation/native";
 
 type modalProp = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
   time?: Date;
   onDateChange?: (e: DateTimePickerEvent, date?: Date) => void;
-  onDone: () => any;
+  onDone?: () => any;
+  recommendedGame?: any;
 };
 
 export const CreateGameModal = (props: modalProp) => {
   const [holes, setHoles] = useState(18);
 
+  const navigation = useNavigation<any>();
+
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
   const [player3, setPlayer3] = useState("");
   const [player4, setPlayer4] = useState("");
+
+  const getCurrentUsername = async () => {
+    const currentUsername = await AsyncStorage.getItem("Username");
+    if (currentUsername) {
+      setPlayer1(currentUsername);
+    }
+  };
+
+  useEffect(() => {
+    getCurrentUsername();
+  }, []);
 
   return (
     <Modal
@@ -43,15 +61,6 @@ export const CreateGameModal = (props: modalProp) => {
               }}
             >
               <Text style={styles.textStyle}>Cancel</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.confirmationButton}
-              onPress={() => {
-                props.onDone();
-              }}
-            >
-              <Text style={styles.textStyle}>Done</Text>
             </Pressable>
           </View>
 
@@ -79,6 +88,7 @@ export const CreateGameModal = (props: modalProp) => {
                   height={40}
                   width={150}
                   handleChange={setPlayer1}
+                  readOnly={true}
                 />
                 <Text style={styles.playerLabel}>Player 2</Text>
                 <InputField
@@ -119,7 +129,30 @@ export const CreateGameModal = (props: modalProp) => {
               text="Start Game!"
               color="#0FBE41"
               pressedColor="#0f6e41"
-              onPress={() => console.log("Star game pressed")}
+              onPress={async () => {
+                try {
+                  const players = [player1, player2, player3, player4].filter(
+                    Boolean,
+                  );
+
+                  const userID = await AsyncStorage.getItem("UserID");
+                  if (!userID) return;
+
+                  const game = await createOfflineGame({
+                    totalHoles: holes,
+                    playerNames: players,
+                    ownerName: player1, // your read-only current user
+                    teeTime: new Date(), // if you capture it
+                    courseName: props.recommendedGame.courseName,
+                    createdUserId: userID,
+                  });
+
+                  props.setModalVisible(false);
+                  navigation.navigate("(game)/game", { localGameId: game.id }); // pass id
+                } catch (e) {
+                  console.warn("Failed to create game:", e);
+                }
+              }}
             />
           </View>
         </View>
@@ -153,7 +186,7 @@ export const SelectTeeOffTimeButton = (props: modalProp) => {
             <Pressable
               style={styles.confirmationButton}
               onPress={() => {
-                props.onDone();
+                props.onDone?.();
               }}
             >
               <Text style={styles.textStyle}>Done</Text>

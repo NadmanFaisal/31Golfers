@@ -35,6 +35,7 @@ type InputProp = {
   placeholderText?: string;
   width?: number;
   height?: number;
+  readOnly?: boolean;
 };
 
 export const InputField = (props: InputProp) => {
@@ -53,6 +54,7 @@ export const InputField = (props: InputProp) => {
       value={props.input}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
+      readOnly={props.readOnly ?? false}
       onChangeText={props.handleChange}
     />
   );

@@ -9,6 +9,9 @@ export default function SettingsScreem() {
     // Deletes the token for new token to be stored
     SecureStore.deleteItemAsync("token");
     await AsyncStorage.removeItem("Location");
+    await AsyncStorage.removeItem("Email");
+    await AsyncStorage.removeItem("Username");
+    await AsyncStorage.removeItem("UserID");
     router.dismissTo("/(auth)/login");
   };
 

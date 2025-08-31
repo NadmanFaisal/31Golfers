@@ -15,6 +15,7 @@ type buttonProp = {
   pressedColor?: string;
   onPress?: () => void;
   onTimeSelected?: (date: Date) => void;
+  recommendedGame?: any;
 };
 
 // Button for when signing up or logging in
@@ -67,11 +68,6 @@ export const CreateGameCircleButton = (props: buttonProp) => {
   // Controls the visibility of Modal
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Takes place on confirmation, for creating game
-  const onDone = () => {
-    setModalVisible(false);
-  };
-
   return (
     <>
       <Pressable
@@ -102,7 +98,7 @@ export const CreateGameCircleButton = (props: buttonProp) => {
       <CreateGameModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        onDone={onDone}
+        recommendedGame={props.recommendedGame}
       />
     </>
   );

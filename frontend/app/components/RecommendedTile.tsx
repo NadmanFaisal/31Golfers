@@ -60,7 +60,7 @@ export default function RecommendedTile(props: RecommendedProps) {
         </View>
       </View>
 
-      {/* A create plus button on the recommended tile */}
+      {/* A create plus button on the recommenderd tile */}
 
       <View style={styles.createGameContainer}>
         <CreateGameCircleButton
@@ -68,7 +68,7 @@ export default function RecommendedTile(props: RecommendedProps) {
           width={50}
           color="#0FBE41"
           pressedColor="#0f6e41"
-          onPress={() => console.log("Create button pressed")}
+          recommendedGame={props.recommendedGame}
         />
       </View>
     </View>
