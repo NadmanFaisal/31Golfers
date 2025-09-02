@@ -1,7 +1,7 @@
 import axios from "axios";
-import { IP } from "./.constants";
+import { ngrok_IP_LINK, IP_LINK } from "./.constants";
 
-let base = `http://${IP}:3000`;
+let base = `${ngrok_IP_LINK}`;
 
 const api = axios.create({
   baseURL: base,

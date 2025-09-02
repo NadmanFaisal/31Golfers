@@ -41,8 +41,31 @@ export const AuthorizationButton = (props: buttonProp) => {
   );
 };
 
-// Button for when signing up or logging in
+// Button for creating games inside a modal
 export const CreateGamenButton = (props: buttonProp) => {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.authorizationButton,
+        {
+          height: props.height ?? "100%",
+          width: props.width ?? "100%",
+          backgroundColor: pressed
+            ? props.pressedColor
+            : (props.color ?? "#999999ff"),
+        },
+      ]}
+      onPress={props.onPress}
+    >
+      <Text style={[styles.buttonText, { fontSize: props.fontSize ?? 20 }]}>
+        {props.text}
+      </Text>
+    </Pressable>
+  );
+};
+
+// Button for clearing off games
+export const FinishGamenButton = (props: buttonProp) => {
   return (
     <Pressable
       style={({ pressed }) => [

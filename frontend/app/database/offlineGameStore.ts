@@ -1,8 +1,4 @@
-// storage/offlineGameStore.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// If you don't have a UUID lib yet, install one. Examples:
-// - nanoid/non-secure  -> npm i nanoid
-// - react-native-uuid  -> npm i react-native-uuid
 import { nanoid } from "nanoid/non-secure";
 import type { LocalGame, LocalPlayer } from "../types/offline";
 
@@ -58,7 +54,6 @@ export async function createOfflineGame({
     id,
     totalHoles,
     startedAt,
-    status: "IN_PROGRESS",
     teeTime: teeTime ? teeTime.toISOString() : undefined,
     courseName,
     players,
@@ -119,7 +114,6 @@ export async function setStrokeOffline({
 export async function completeOfflineGame(gameId: string) {
   const game = await getOfflineGame(gameId);
   if (!game) return null;
-  game.status = "COMPLETED";
   game.endedAt = new Date().toISOString();
   await AsyncStorage.setItem(K.game(gameId), JSON.stringify(game));
 

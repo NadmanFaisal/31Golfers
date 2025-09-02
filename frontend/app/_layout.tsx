@@ -20,6 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)/login" />
         <Stack.Screen name="(home)/home" />
         <Stack.Screen name="(game)/game" />
+        <Stack.Screen name="(game)/gameInfoScreen" />
         <Stack.Screen name="settings" />
       </Stack>
 
@@ -45,7 +46,7 @@ function Footer() {
     // pathName helps to keep consistent if navigation
     // is done without the footer bar
     if (pathname !== path) {
-      router.replace(path); // `path` stays typed as Href
+      router.dismissTo(path); // `path` stays typed as Href
     }
   };
 

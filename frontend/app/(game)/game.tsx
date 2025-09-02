@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text } from "react-native";
+import { Pressable, SafeAreaView, Text } from "react-native";
 import { getCurrentOfflineGame } from "../database/offlineGameStore";
 import { LocalGame } from "../types/offline";
+import { router } from "expo-router";
 
 export default function GameScreen() {
-  const [game, setGame] = useState<LocalGame | null>();
+  const [currentOfflineGame, setCurrentOfflineGame] =
+    useState<LocalGame | null>();
 
   const getGame = async () => {
     const fetchedGame = await getCurrentOfflineGame();
     if (!fetchedGame) return;
-    setGame(fetchedGame);
+    setCurrentOfflineGame(fetchedGame);
     console.log("Fetched game: ", fetchedGame);
+  };
+
+  const gotoGameInfoScreen = () => {
+    router.push("/gameInfoScreen");
   };
 
   useEffect(() => {
@@ -19,8 +25,10 @@ export default function GameScreen() {
 
   return (
     <SafeAreaView>
-      <Text>This is the game screen</Text>
-      <Text>Game: {game?.totalHoles}</Text>
+      <Pressable onPress={() => gotoGameInfoScreen()}>
+        <Text>This is the game screen</Text>
+        <Text>Game: {currentOfflineGame?.totalHoles}</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }

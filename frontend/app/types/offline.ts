@@ -11,7 +11,6 @@ export type LocalGame = {
   totalHoles: number;
   startedAt: string; // ISO
   endedAt?: string;
-  status: "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   teeTime?: string; // ISO
   courseName?: string;
 

@@ -9,8 +9,12 @@ import { InputField } from "./inputFields";
 import { CreateGamenButton } from "./Buttons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { createOfflineGame } from "../database/offlineGameStore";
+import {
+  createOfflineGame,
+  getCurrentOfflineGame,
+} from "../database/offlineGameStore";
 import { useNavigation } from "@react-navigation/native";
+import { LocalGame } from "../types/offline";
 
 type modalProp = {
   modalVisible: boolean;
@@ -22,6 +26,8 @@ type modalProp = {
 };
 
 export const CreateGameModal = (props: modalProp) => {
+  const [currentOfflineGame, setCurrentOfflineGame] =
+    useState<LocalGame | null>();
   const [holes, setHoles] = useState(18);
 
   const navigation = useNavigation<any>();
@@ -37,6 +43,17 @@ export const CreateGameModal = (props: modalProp) => {
       setPlayer1(currentUsername);
     }
   };
+
+  const getGame = async () => {
+    const fetchedGame = await getCurrentOfflineGame();
+    if (!fetchedGame) return;
+    setCurrentOfflineGame(fetchedGame);
+    console.log("Fetched game: ", fetchedGame);
+  };
+
+  useEffect(() => {
+    getGame();
+  }, []);
 
   useEffect(() => {
     getCurrentUsername();
@@ -131,6 +148,13 @@ export const CreateGameModal = (props: modalProp) => {
               pressedColor="#0f6e41"
               onPress={async () => {
                 try {
+                  if (currentOfflineGame) {
+                    alert(
+                      "Current offline game exists, finish that and create a new one",
+                    );
+                    return;
+                  }
+
                   const players = [player1, player2, player3, player4].filter(
                     Boolean,
                   );
