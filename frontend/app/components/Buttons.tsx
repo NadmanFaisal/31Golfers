@@ -106,7 +106,6 @@ export const CreateGameCircleButton = (props: buttonProp) => {
         ]}
         onPress={() => {
           // Navigates to the game screen, where the game will show
-          router.push("/game");
           setModalVisible(true);
         }}
       >

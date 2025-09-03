@@ -2,11 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { nanoid } from "nanoid/non-secure";
 import type { LocalGame, LocalPlayer } from "../types/offline";
 
+import { postCompletedGame } from "../api/game";
+
 const K = {
   index: "ga:index", // JSON string[] of game ids
   currentGameId: "ga:currentGame", // string
   game: (id: string) => `ga:game:${id}`,
 };
+
+const PENDING = "ga:pendingComplete";
 
 async function getIndex(): Promise<string[]> {
   const raw = await AsyncStorage.getItem(K.index);
@@ -14,6 +18,23 @@ async function getIndex(): Promise<string[]> {
 }
 async function setIndex(ids: string[]) {
   await AsyncStorage.setItem(K.index, JSON.stringify(ids));
+}
+
+async function getPending(): Promise<string[]> {
+  const raw = await AsyncStorage.getItem(PENDING);
+  return raw ? JSON.parse(raw) : [];
+}
+async function addPending(gameId: string) {
+  const ids = await getPending();
+  if (!ids.includes(gameId)) {
+    ids.push(gameId);
+    await AsyncStorage.setItem(PENDING, JSON.stringify(ids));
+  }
+}
+async function removePending(gameId: string) {
+  const ids = await getPending();
+  const next = ids.filter((id) => id !== gameId);
+  await AsyncStorage.setItem(PENDING, JSON.stringify(next));
 }
 
 export async function createOfflineGame({
@@ -111,7 +132,7 @@ export async function setStrokeOffline({
   return game;
 }
 
-export async function completeOfflineGame(gameId: string) {
+export async function completeOfflineGame(gameId: string, token: string) {
   const game = await getOfflineGame(gameId);
   if (!game) return null;
   game.endedAt = new Date().toISOString();
@@ -122,5 +143,26 @@ export async function completeOfflineGame(gameId: string) {
   if (current === gameId) {
     await AsyncStorage.removeItem(K.currentGameId);
   }
+
+  syncCurrentGameWithBackend(gameId, token);
   return game;
+}
+
+export async function syncCurrentGameWithBackend(
+  gameId: string,
+  token: string,
+) {
+  // Sync the offline game with the backend
+  try {
+    const response = await postCompletedGame(gameId, token);
+    // On success, clear local copy (if that’s your policy)
+    if (response.status === 200) {
+      await AsyncStorage.removeItem(K.game(gameId));
+      // Also ensure it isn’t in pending
+      await removePending(gameId);
+    }
+  } catch {
+    alert("Currently offline. Come back online to sync progress with cloud.");
+    await addPending(gameId);
+  }
 }

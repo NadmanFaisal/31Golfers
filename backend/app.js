@@ -30,6 +30,10 @@ app.use('/location', authenticateToken, locationRoutes)
 app.use('/game', authenticateToken, gameRoutes);
 
 app.get('/health', (_req,res)=>res.json({status:'ok'}));
+app.post("/game/complete", (req, res) => {
+  console.log("Completed game received:", req.body);
+  res.status(200).json("Game completed!");
+});
 
 /**
  * List of golf course locations, stored as a 
@@ -77,7 +81,6 @@ async function fetchAndSaveWeather() {
  */
 
 cron.schedule('0 0 0 * * *', fetchAndSaveWeather, { timezone: "Asia/Dhaka" });
-fetchAndSaveWeather();
 
 app.listen(PORT, (error) => {
   if (!error) {

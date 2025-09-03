@@ -1,3 +1,4 @@
+import { getOfflineGame } from "../database/offlineGameStore";
 import api from "./api";
 
 /**
@@ -28,6 +29,23 @@ export const getRecommendedGameSession = async (
       },
     });
     return response.data;
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Getting recommended game failed.";
+    throw new Error(message);
+  }
+};
+
+export const postCompletedGame = async (gameId: string, token: string) => {
+  const game = await getOfflineGame(gameId);
+  if (!game || !game.endedAt) throw new Error("Game not ready");
+  try {
+    const response = await api.post("/game/complete", game, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response;
   } catch (err: any) {
     const message =
       err?.response?.data?.message ||

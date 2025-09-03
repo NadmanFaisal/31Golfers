@@ -1,27 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, SafeAreaView, Text } from "react-native";
 import { getCurrentOfflineGame } from "../database/offlineGameStore";
 import { LocalGame } from "../types/offline";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 
 export default function GameScreen() {
   const [currentOfflineGame, setCurrentOfflineGame] =
-    useState<LocalGame | null>();
+    useState<LocalGame | null>(null);
 
-  const getGame = async () => {
-    const fetchedGame = await getCurrentOfflineGame();
-    if (!fetchedGame) return;
-    setCurrentOfflineGame(fetchedGame);
-    console.log("Fetched game: ", fetchedGame);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      (async () => {
+        const g = await getCurrentOfflineGame();
+        if (active) setCurrentOfflineGame(g);
+        console.log("Setting done");
+      })();
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   const gotoGameInfoScreen = () => {
     router.push("/gameInfoScreen");
   };
-
-  useEffect(() => {
-    getGame();
-  }, []);
 
   return (
     <SafeAreaView>

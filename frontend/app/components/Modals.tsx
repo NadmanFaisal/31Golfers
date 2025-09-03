@@ -15,6 +15,7 @@ import {
 } from "../database/offlineGameStore";
 import { useNavigation } from "@react-navigation/native";
 import { LocalGame } from "../types/offline";
+import { router } from "expo-router";
 
 type modalProp = {
   modalVisible: boolean;
@@ -170,9 +171,10 @@ export const CreateGameModal = (props: modalProp) => {
                     courseName: props.recommendedGame.courseName,
                     createdUserId: userID,
                   });
-
-                  props.setModalVisible(false);
-                  navigation.navigate("(game)/game", { localGameId: game.id }); // pass id
+                  if (game) {
+                    props.setModalVisible(false);
+                    router.dismissTo("/game");
+                  }
                 } catch (e) {
                   console.warn("Failed to create game:", e);
                 }
