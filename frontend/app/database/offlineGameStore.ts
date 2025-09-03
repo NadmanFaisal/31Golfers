@@ -154,7 +154,9 @@ export async function syncCurrentGameWithBackend(
 ) {
   // Sync the offline game with the backend
   try {
-    const response = await postCompletedGame(gameId, token);
+    const game = await getOfflineGame(gameId);
+    if (!game || !game.endedAt) throw new Error("Game not ready");
+    const response = await postCompletedGame(game, token);
     // On success, clear local copy (if that’s your policy)
     if (response.status === 200) {
       await AsyncStorage.removeItem(K.game(gameId));

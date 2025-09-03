@@ -1,4 +1,5 @@
 import { getOfflineGame } from "../database/offlineGameStore";
+import { LocalGame } from "../types/offline";
 import api from "./api";
 
 /**
@@ -38,9 +39,17 @@ export const getRecommendedGameSession = async (
   }
 };
 
-export const postCompletedGame = async (gameId: string, token: string) => {
-  const game = await getOfflineGame(gameId);
-  if (!game || !game.endedAt) throw new Error("Game not ready");
+/**
+ * Sends a completed game to the backend API for persistence.
+ * - Makes a POST request to `/game/complete` with the game payload.
+ * - Returns the API response if successful.
+ * - Throws an error with a descriptive message if the request fails.
+ * @param {LocalGame} game - The completed game object to be sent to the server.
+ * @param {string} token - JWT or auth token for request authorization.
+ * @returns {Promise} The Axios response from the backend API.
+ * @throws {Error} Will throw if the request fails, with the error message from the server or a fallback message.
+ */
+export const postCompletedGame = async (game: LocalGame, token: string) => {
   try {
     const response = await api.post("/game/complete", game, {
       headers: { Authorization: `Bearer ${token}` },

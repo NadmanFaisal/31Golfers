@@ -14,7 +14,6 @@ export default function GameScreen() {
       (async () => {
         const g = await getCurrentOfflineGame();
         if (active) setCurrentOfflineGame(g);
-        console.log("Setting done");
       })();
       return () => {
         active = false;

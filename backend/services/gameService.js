@@ -71,6 +71,87 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
   }
 }
 
+/**
+ * Saves a completed game into the database.
+ *
+ * - Validates the incoming payload for required fields.
+ * - Normalizes players into Prisma-compatible composite `Player` objects.
+ * - Derives the `ownerUserId` from the player marked as owner.
+ * - Uses Prisma's `upsert` to either create a new game or update an existing one.
+ * @param {Object} payload - Game data from the frontend.
+ * @throws {Error} Will throw an error with statusCode `400` if the payload is invalid or missing required fields.
+ * @returns {Promise<Object>} The saved game record from Prisma, containing all persisted fields.
+ */
+async function saveGame(payload) {
+  console.log(payload);
+  if (!payload || !payload.id || !payload.totalHoles || !payload.startedAt) {
+   const err = new Error("Invalid payload: id, totalHoles, startedAt are required");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const startedAt = new Date(payload.startedAt);
+  const endedAt   = new Date(payload.endedAt);
+  const teeTime   = new Date(payload.teeTime);
+  if (!startedAt) {
+    const err = new Error("Invalid startedAt");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Normalize players to Prisma composite `Player`
+  const players = Array.isArray(payload.players) ? payload.players : [];
+  const normalizedPlayers = players.map((p) => ({
+    // ID of the player given by nanoid from frontend
+    id: String(p.id),
+    displayName: String(p.displayName ?? ""),
+    // ID of the owner given by nanoid from frontend
+    userId: p.userId ?? undefined,
+    order: Number(p.order ?? 0),
+    isOwner: p.isOwner ?? undefined,
+  }));
+
+  // The id of the player who created the game
+  const ownerUserId =
+    players.find((p) => p && p.isOwner && p.userId)?.userId ?? undefined;
+
+    const strokesByPlayer =
+    payload.strokesByPlayer && typeof payload.strokesByPlayer === "object"
+      ? payload.strokesByPlayer
+      : {};
+
+  // Will update game if it already exists, else creates a new game in the DB
+  const saved = await prisma.completedGame.upsert({
+    // ID of the game
+    where: { id: payload.id },
+    create: {
+      // ID of the game
+      id: payload.id,
+      totalHoles: Number(payload.totalHoles),
+      startedAt,
+      endedAt: endedAt ?? undefined,
+      teeTime: teeTime ?? undefined,
+      courseName: payload.courseName ?? undefined,
+      players: normalizedPlayers,
+      strokesByPlayer,
+      ownerUserId,
+    },
+    update: {
+      totalHoles: Number(payload.totalHoles),
+      startedAt,
+      endedAt: endedAt ?? undefined,
+      teeTime: teeTime ?? undefined,
+      courseName: payload.courseName ?? undefined,
+      players: normalizedPlayers,
+      strokesByPlayer,
+      ownerUserId,
+    },
+  });
+
+  return saved;
+}
+
 module.exports = {
-  calculatePlayableHoles
+  saveGame,
+  calculatePlayableHoles,
 }

@@ -10,7 +10,6 @@ const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
 const { saveCourse, saveDailyForecast, saveHourlyForecasts } = require('./services/weatherService');
-const { calculatePlayableHole } = require("./services/gameService");
 
 // Global env configuration
 dotenv.config();
@@ -30,10 +29,6 @@ app.use('/location', authenticateToken, locationRoutes)
 app.use('/game', authenticateToken, gameRoutes);
 
 app.get('/health', (_req,res)=>res.json({status:'ok'}));
-app.post("/game/complete", (req, res) => {
-  console.log("Completed game received:", req.body);
-  res.status(200).json("Game completed!");
-});
 
 /**
  * List of golf course locations, stored as a 
