@@ -31,8 +31,6 @@ export const CreateGameModal = (props: modalProp) => {
     useState<LocalGame | null>();
   const [holes, setHoles] = useState(18);
 
-  const navigation = useNavigation<any>();
-
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
   const [player3, setPlayer3] = useState("");

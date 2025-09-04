@@ -127,8 +127,6 @@ export async function setStrokeOffline({
   // Save back
   await AsyncStorage.setItem(K.game(gameId), JSON.stringify(game));
 
-  // (Optional) enqueue for sync:
-  // await enqueueOutbox({ type: "SET_STROKE", gameId, playerId, holeNumber, strokes, at: Date.now() });
   return game;
 }
 

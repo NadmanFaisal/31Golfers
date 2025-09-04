@@ -64,6 +64,45 @@ export const CreateGamenButton = (props: buttonProp) => {
   );
 };
 
+// Button for starting games inside from home screen
+export const StartGamenButton = (props: buttonProp) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  return (
+    <>
+      <Pressable
+        style={({ pressed }) => [
+          styles.authorizationButton,
+          {
+            height: props.height ?? "100%",
+            width: props.width ?? "100%",
+            backgroundColor: pressed
+              ? props.pressedColor
+              : (props.color ?? "#999999ff"),
+          },
+        ]}
+        onPress={() => setModalVisible(true)}
+      >
+        <Image
+          style={styles.teeoffLogo}
+          source={require("../../assets/images/game_icon.png")}
+          resizeMode="contain"
+        />
+        <Text style={[styles.buttonText, { fontSize: props.fontSize ?? 20 }]}>
+          {props.text}
+        </Text>
+      </Pressable>
+
+      {/* Modal for creating a game */}
+      <CreateGameModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        recommendedGame={props.recommendedGame}
+      />
+    </>
+  );
+};
+
 // Button for clearing off games
 export const FinishGamenButton = (props: buttonProp) => {
   return (

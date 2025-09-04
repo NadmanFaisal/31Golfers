@@ -6,7 +6,7 @@ import { Text, SafeAreaView, View } from "react-native";
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
 import RecommendedTile from "../components/RecommendedTile";
-import { CreateGamenButton, TeeOffButton } from "../components/Buttons";
+import { StartGamenButton, TeeOffButton } from "../components/Buttons";
 
 import { getAllLocations } from "../api/location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -247,12 +247,13 @@ export default function HomeScreen() {
             />
           </View>
           <View style={styles.lowerSelectionContainer}>
-            <CreateGamenButton
+            <StartGamenButton
               text="Start a Game!"
               height={75}
               width={350}
               color="#0FBE41"
               pressedColor="#0f6e41"
+              recommendedGame={recommendedGame}
             />
           </View>
         </View>
