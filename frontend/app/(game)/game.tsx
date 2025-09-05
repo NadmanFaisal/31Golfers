@@ -32,18 +32,20 @@ export default function GameScreen() {
 
   return (
     <SafeAreaView>
-      <View style={styles.recomGameContainer}>
-        <OngoingGameTile
-          ongoingGame={currentOfflineGame}
-          onPress={gotoGameInfoScreen}
-        />
-      </View>
-      <View style={styles.historyContainer}>
-        <Text>Hello</Text>
-        <Pressable onPress={() => gotoGameInfoScreen()}>
-          <Text>This is the game screen</Text>
-          <Text>Game: {currentOfflineGame?.totalHoles}</Text>
-        </Pressable>
+      <View style={styles.mainContainer}>
+        <View style={styles.recomGameContainer}>
+          <OngoingGameTile
+            ongoingGame={currentOfflineGame}
+            onPress={gotoGameInfoScreen}
+          />
+        </View>
+        <View style={styles.historyContainer}>
+          <Text>Hello</Text>
+          <Pressable onPress={() => gotoGameInfoScreen()}>
+            <Text>This is the game screen</Text>
+            <Text>Game: {currentOfflineGame?.totalHoles}</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );

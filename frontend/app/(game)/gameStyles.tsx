@@ -1,6 +1,15 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    width: "100%",
+    padding: 10,
+  },
   recomGameContainer: {
     display: "flex",
     flexDirection: "column",
