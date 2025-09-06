@@ -24,6 +24,25 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 5,
   },
+  historyLabelContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "10%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "flex-start",
+  },
+  label: {
+    color: "#5e5e5eff",
+    fontSize: 24,
+    fontWeight: 500,
+  },
+  historyGameContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "90%",
+    width: "100%",
+  },
 });
 
 export default styles;

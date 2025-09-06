@@ -166,7 +166,7 @@ export const CreateGameModal = (props: modalProp) => {
                     playerNames: players,
                     ownerName: player1, // your read-only current user
                     teeTime: new Date(), // if you capture it
-                    courseName: props.recommendedGame.courseName,
+                    courseName: props.recommendedGame.coursename,
                     createdUserId: userID,
                   });
                   if (game) {

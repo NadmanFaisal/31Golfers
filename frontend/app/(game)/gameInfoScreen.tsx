@@ -98,7 +98,7 @@ export default function GameInfoScreen() {
               Alert.alert(
                 "Game finished. We’ll sync it to the backend when online.",
               );
-              router.back();
+              router.dismissTo("/game");
             } catch (e: any) {
               Alert.alert(e?.message);
             }

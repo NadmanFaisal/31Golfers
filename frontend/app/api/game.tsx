@@ -51,6 +51,7 @@ export const getRecommendedGameSession = async (
  */
 export const postCompletedGame = async (game: LocalGame, token: string) => {
   try {
+    console.log("Game: ", game);
     const response = await api.post("/game/complete", game, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -60,6 +61,29 @@ export const postCompletedGame = async (game: LocalGame, token: string) => {
       err?.response?.data?.message ||
       err?.message ||
       "Getting recommended game failed.";
+    throw new Error(message);
+  }
+};
+
+/**
+ * Sends a request to get a list of games to the backend.
+ * - Makes a GET request to `/game/games`.
+ * - Returns the API response if successful.
+ * - Throws an error with a descriptive message if the request fails.
+ * @param {string} token - JWT or auth token for request authorization.
+ * @returns {Promise} The Axios response from the backend API.
+ * @throws {Error} Will throw if the request fails, with the error message from the server or a fallback message.
+ */
+export const getAllGames = async (userID: string, token: string) => {
+  try {
+    const response = await api.get("/game/games", {
+      params: { userID },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.message || err?.message || "Getting games failed.";
     throw new Error(message);
   }
 };

@@ -48,3 +48,23 @@ exports.finish_game = async (req, res) => {
     });
   }
 }
+
+/**
+ * Controller to handle returning a list of games.
+ *
+ * @param {Response} res - Express response object used to send back the result.
+ * @returns {Promise<void>} Responds with JSON:
+ */
+exports.get_games = async (req, res) => {
+  try {
+    const userID = req.query.userID;
+    const response = await gameService.getAllGames(userID);
+    return res.status(200).json(response);
+  } catch (err) {
+    const status = err.statusCode || 500;
+    console.error("finish_game error:", err);
+    return res.status(status).json({
+      error: err.message || "Internal error",
+    });
+  }
+}
