@@ -19,6 +19,8 @@ import { FinishGamenButton } from "../components/Buttons";
 import { router, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
+import ScoreTable from "../components/ScoreTable";
+
 import styles from "./gameInfoScreenStyles";
 
 export default function GameInfoScreen() {
@@ -136,96 +138,15 @@ export default function GameInfoScreen() {
     <SafeAreaView>
       <View style={styles.mainContainer}>
         <View style={styles.scoreContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator
-            contentContainerStyle={styles.tableWrap}
-            style={{ flex: 1 }}
-          >
-            <View>
-              {/* Header row */}
-              <View style={styles.headerRow}>
-                <View style={[styles.holeHeaderCell, styles.headerCell]}>
-                  <Text style={styles.headerText}>Hole</Text>
-                </View>
-                {(currentOfflineGame?.players ?? []).map((p) => (
-                  <View
-                    key={p.id}
-                    style={[styles.playerHeaderCell, styles.headerCell]}
-                  >
-                    <Text style={styles.headerText} numberOfLines={1}>
-                      {p.displayName}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Body rows, one row per hole */}
-              {Array.from(
-                { length: currentOfflineGame?.totalHoles || 0 },
-                (_, i) => i + 1,
-              ).map((hole) => (
-                <View key={`row-${hole}`} style={styles.bodyRow}>
-                  {/* Hole index */}
-                  <View style={styles.holeCell}>
-                    <Text style={styles.bodyText}>{hole}</Text>
-                  </View>
-
-                  {/* One score cell per player, with inline editable */}
-                  {(currentOfflineGame?.players ?? []).map((p, colIdx) => {
-                    const strokes =
-                      currentOfflineGame?.strokesByPlayer?.[p.id] || [];
-                    const val = strokes[hole - 1];
-                    const isEditing =
-                      editingCell?.playerId === p.id &&
-                      editingCell?.hole === hole;
-
-                    if (isEditing) {
-                      return (
-                        <View
-                          key={`${p.id}-${hole}`}
-                          style={[
-                            styles.scoreCell,
-                            colIdx === 0 ? styles.firstScoreCol : undefined,
-                          ]}
-                        >
-                          <TextInput
-                            autoFocus
-                            value={inputValue}
-                            onChangeText={setInputValue}
-                            keyboardType="number-pad"
-                            returnKeyType="done"
-                            onSubmitEditing={commitEdit}
-                            onBlur={commitEdit}
-                            style={styles.cellInput}
-                            placeholder="–"
-                            placeholderTextColor="#999"
-                            maxLength={2}
-                          />
-                        </View>
-                      );
-                    }
-
-                    return (
-                      <TouchableOpacity
-                        key={`${p.id}-${hole}`}
-                        activeOpacity={0.6}
-                        onPress={() => startEdit(p.id, hole, val)}
-                        style={[
-                          styles.scoreCell,
-                          colIdx === 0 ? styles.firstScoreCol : undefined,
-                        ]}
-                      >
-                        <Text style={styles.bodyText}>
-                          {typeof val === "number" ? String(val) : "–"}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
-          </ScrollView>
+          <ScoreTable
+            game={currentOfflineGame}
+            editingCell={editingCell}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            commitEdit={commitEdit}
+            startEdit={startEdit}
+            isEditing={true}
+          />
         </View>
 
         <View style={styles.buttonContainer}>
