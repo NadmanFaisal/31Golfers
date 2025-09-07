@@ -77,9 +77,11 @@ model HourlyForecast {
 type Player {
   id          String
   displayName String
+
+  // Optional because only owner player will have userId
   userId      String?
   order       Int
-  isOwner     Boolean?
+  isOwner     Boolean
 }
 
 model CompletedGame {
@@ -87,9 +89,9 @@ model CompletedGame {
 
   totalHoles       Int
   startedAt        DateTime
-  endedAt          DateTime?
-  teeTime          DateTime?
-  courseName       String?
+  endedAt          DateTime
+  teeTime          DateTime
+  courseName       String
 
   players          Player[]
   strokesByPlayer  Json
@@ -97,7 +99,7 @@ model CompletedGame {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
-  ownerUserId      String?
+  ownerUserId      String
 
   @@index([startedAt])
   @@index([ownerUserId])

@@ -156,11 +156,14 @@ async function saveGame(payload) {
  * @param {string=} userID - only return games that include this user
  */
 async function getAllGames(userID) {
+  
+  // To find games where the user is owner, or one 
+  // of the players 
   const where = userID
     ? {
         OR: [
-          { ownerUserId: userID },                 // games owned by the user
-          { players: { some: { userId: userID } } } // games where user participated
+          { ownerUserId: userID },
+          { players: { some: { userId: userID } } }
         ],
       }
     : {};
@@ -174,39 +177,12 @@ async function getAllGames(userID) {
           id: true,
           displayName: true,
           userId: true,
-          // no order/isOwner here because they aren't on Player in your schema
         },
       },
     },
   });
 
-  // Build response + per-player totals from strokesByPlayer JSON
-  return games.map((g) => {
-    /** @type {Record<string, number[]>} */
-    const sbp = (g.strokesByPlayer ?? {});
-    const totalsByPlayer = {};
-
-    for (const p of g.players) {
-      const arr = Array.isArray(sbp[p.id]) ? sbp[p.id] : [];
-      let total = 0;
-      for (const v of arr) {
-        if (typeof v === 'number') total += v;
-      }
-      totalsByPlayer[p.id] = total;
-    }
-
-    return {
-      id: g.id,
-      totalHoles: g.totalHoles,
-      startedAt: g.startedAt,
-      endedAt: g.endedAt ?? null,
-      teeTime: g.teeTime ?? null,
-      courseName: g.courseName ?? null,
-      ownerUserId: g.ownerUserId ?? null,
-      players: g.players,         // [{ id, displayName, userId }]
-      totalsByPlayer,             // { [playerId]: number }
-    };
-  });
+  return games;
 }
 
 module.exports = {

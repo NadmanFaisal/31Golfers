@@ -16,6 +16,7 @@ type buttonProp = {
   onPress?: () => void;
   onTimeSelected?: (date: Date) => void;
   recommendedGame?: any;
+  location?: any;
 };
 
 // Button for when signing up or logging in
@@ -120,6 +121,7 @@ export const StartGamenButton = (props: buttonProp) => {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         recommendedGame={props.recommendedGame}
+        location={props.location}
       />
     </>
   );

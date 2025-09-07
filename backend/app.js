@@ -10,6 +10,7 @@ const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
 const { saveCourse, saveDailyForecast, saveHourlyForecasts } = require('./services/weatherService');
+const { FileWatcherEventKind } = require('typescript');
 
 // Global env configuration
 dotenv.config();

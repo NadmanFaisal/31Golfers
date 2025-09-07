@@ -5,8 +5,8 @@ import type { LocalGame, LocalPlayer } from "../types/offline";
 import { postCompletedGame } from "../api/game";
 
 const K = {
-  index: "ga:index", // JSON string[] of game ids
-  currentGameId: "ga:currentGame", // string
+  index: "ga:index",
+  currentGameId: "ga:currentGame",
   game: (id: string) => `ga:game:${id}`,
 };
 
@@ -39,18 +39,18 @@ async function removePending(gameId: string) {
 
 export async function createOfflineGame({
   totalHoles,
-  playerNames, // string[]
-  ownerName, // string
-  teeTime, // Date | undefined
-  courseName, // string | undefined
-  createdUserId, // string | undefined (if logged in)
+  playerNames,
+  ownerName,
+  teeTime,
+  courseName,
+  createdUserId,
 }: {
   totalHoles: number;
-  playerNames: string[]; // include owner in this list
+  playerNames: string[];
   ownerName: string;
-  teeTime?: Date;
-  courseName?: string;
-  createdUserId?: string;
+  teeTime: Date;
+  courseName: string;
+  createdUserId: string;
 }): Promise<LocalGame> {
   const id = nanoid();
   const startedAt = new Date().toISOString();
@@ -60,7 +60,7 @@ export async function createOfflineGame({
   const players: LocalPlayer[] = uniqueNames.map((name, i) => ({
     id: nanoid(),
     displayName: name,
-    userId: name === ownerName ? (createdUserId ?? undefined) : undefined,
+    userId: name === ownerName ? createdUserId : undefined,
     order: i,
     isOwner: name === ownerName,
   }));
@@ -75,7 +75,7 @@ export async function createOfflineGame({
     id,
     totalHoles,
     startedAt,
-    teeTime: teeTime ? teeTime.toISOString() : undefined,
+    teeTime: teeTime.toISOString(),
     courseName,
     players,
     strokesByPlayer,
@@ -108,7 +108,7 @@ export async function getCurrentOfflineGame(): Promise<LocalGame | null> {
 export async function setStrokeOffline({
   gameId,
   playerId,
-  holeNumber, // 1..N
+  holeNumber,
   strokes,
 }: {
   gameId: string;
@@ -130,6 +130,15 @@ export async function setStrokeOffline({
   return game;
 }
 
+async function flushPendingCompletedGames(token: string) {
+  const ids = await getPending();
+  if (ids.length === 0) return;
+
+  for (const id of [...ids]) {
+    await syncCurrentGameWithBackend(id, token);
+  }
+}
+
 export async function completeOfflineGame(gameId: string, token: string) {
   const game = await getOfflineGame(gameId);
   if (!game) return null;
@@ -142,14 +151,12 @@ export async function completeOfflineGame(gameId: string, token: string) {
     await AsyncStorage.removeItem(K.currentGameId);
   }
 
-  syncCurrentGameWithBackend(gameId, token);
+  await addPending(gameId);
+  await flushPendingCompletedGames(token);
   return game;
 }
 
-export async function syncCurrentGameWithBackend(
-  gameId: string,
-  token: string,
-) {
+async function syncCurrentGameWithBackend(gameId: string, token: string) {
   // Sync the offline game with the backend
   try {
     const game = await getOfflineGame(gameId);

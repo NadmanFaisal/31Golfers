@@ -13,7 +13,6 @@ import {
   createOfflineGame,
   getCurrentOfflineGame,
 } from "../database/offlineGameStore";
-import { useNavigation } from "@react-navigation/native";
 import { LocalGame } from "../types/offline";
 import { router } from "expo-router";
 
@@ -24,6 +23,7 @@ type modalProp = {
   onDateChange?: (e: DateTimePickerEvent, date?: Date) => void;
   onDone?: () => any;
   recommendedGame?: any;
+  location?: string;
 };
 
 export const CreateGameModal = (props: modalProp) => {
@@ -139,6 +139,7 @@ export const CreateGameModal = (props: modalProp) => {
           </View>
 
           <View style={styles.gameCreateButtonContainer}>
+            <Text>Location: {props.location}</Text>
             <CreateGamenButton
               height={75}
               width={250}
@@ -161,12 +162,14 @@ export const CreateGameModal = (props: modalProp) => {
                   const userID = await AsyncStorage.getItem("UserID");
                   if (!userID) return;
 
+                  const coursename =
+                    props.recommendedGame?.coursename ?? props.location;
                   const game = await createOfflineGame({
                     totalHoles: holes,
                     playerNames: players,
-                    ownerName: player1, // your read-only current user
-                    teeTime: new Date(), // if you capture it
-                    courseName: props.recommendedGame.coursename,
+                    ownerName: player1,
+                    teeTime: new Date(),
+                    courseName: coursename,
                     createdUserId: userID,
                   });
                   if (game) {
