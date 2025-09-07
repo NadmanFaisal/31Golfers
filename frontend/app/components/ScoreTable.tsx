@@ -66,6 +66,8 @@ export default function ScoreTable(props: tableProps) {
                 props.editingCell?.playerId === p.id &&
                 props.editingCell?.hole === hole;
 
+              // Itterates through all the cells and checks whether
+              // it is eligible for editing
               if (props.isEditing && isEditing) {
                 return (
                   <View
