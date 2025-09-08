@@ -6,9 +6,9 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     height: "100%",
     width: "100%",
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 15,
+    padding: 15,
+    // paddingRight: 15,
+    // paddingTop: 15,
   },
   weatherContainer: {
     display: "flex",
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   gameRecommendationContainer: {
     display: "flex",
     flexDirection: "column",
-    height: "20%",
+    height: "25%",
     width: "100%",
     alignItems: "center",
     justifyContent: "flex-start",

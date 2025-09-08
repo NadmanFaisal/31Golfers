@@ -10,7 +10,7 @@ const authenticateToken = require('./middleware/authMiddleware');
 
 const weatherapi = require('./api/weather')
 const { saveCourse, saveDailyForecast, saveHourlyForecasts } = require('./services/weatherService');
-const { calculatePlayableHole } = require("./services/gameService");
+const { FileWatcherEventKind } = require('typescript');
 
 // Global env configuration
 dotenv.config();
@@ -29,6 +29,8 @@ app.use('/weather', authenticateToken, weatherRoutes)
 app.use('/location', authenticateToken, locationRoutes)
 app.use('/game', authenticateToken, gameRoutes);
 
+app.get('/health', (_req,res)=>res.json({status:'ok'}));
+
 /**
  * List of golf course locations, stored as a 
  * dictionary for the time being
@@ -36,9 +38,9 @@ app.use('/game', authenticateToken, gameRoutes);
 const locations = {
   'Army Golf Club': ['23.819077865220255', '90.41398771473996'],
   'Bangladesh Ordnance Factory Golf Club': ['24.0347943579793', '90.41460480992527'],
-  'Bhatiary Golf and Country': ['22.42653547564263', '91.76631932523291'],
-  'Bogra Golf Club': ['24.767497978715515', '89.3825549252833'],
-  'Ghatail Golf Club': ['24.499120491192368', '89.99708652134241'],
+  // 'Bhatiary Golf and Country': ['22.429003', '91.766139'],
+  // 'Bogra Golf Club': ['24.850000', '89.367000'],
+  // 'Ghatail Golf Club': ['24.481195', '89.973180'],
   'Jessore Golf & Country Club': ['23.178229462110743', '89.16758981175471'],
   'Kurmitola Golf Club': ['23.799540125030667', '90.39626172526172'],
   'Mainamati Golf and Country Club': ['23.465426851934993', '91.12131861545646'],
@@ -53,7 +55,7 @@ async function fetchAndSaveWeather() {
     try {
       const course = await saveCourse(locationName, lat, lon);
 
-      const response = await weatherapi.get_weather(lat, lon, 7);
+      const response = await weatherapi.get_weather(lat, lon, 1);
       console.log("Weathers: ", response.data.forecast.forecastday);
       const forecastDays = response.data.forecast.forecastday;
 
@@ -64,7 +66,7 @@ async function fetchAndSaveWeather() {
 
       console.log(`Saved weather for ${locationName}`);
     } catch (error) {
-      console.error(`Error saving weather for ${locationName}:`, error.message);
+      console.error(`Error saving weather for ${locationName}:`, error.stack || error);
     }
   }
 }
@@ -74,18 +76,13 @@ async function fetchAndSaveWeather() {
  * everyday. 
  */
 
-cron.schedule('0 0 0 * * *', fetchAndSaveWeather, {timezone: "Asia/Dhaka"});
+cron.schedule('0 0 0 * * *', fetchAndSaveWeather, { timezone: "Asia/Dhaka" });
 
-app.listen(PORT, (error) =>{
-    if(!error) {
-        console.log("Server is Successfully Running, and App is listening on port "+ PORT);
-        // (async () => {
-        //   const teeOffTime = new Date("2025-08-11T15:30:00");
-        //   const result = await calculatePlayableHoles("Kurmitola Golf Club", teeOffTime, 18, 13);
-        //   console.log(result);
-        // })();
-    }
-    else 
-      console.log("Error occurred, server can't start", error);
-    }
+app.listen(PORT, (error) => {
+  if (!error) {
+    console.log("Server is Successfully Running, and App is listening on port " + PORT);
+  }
+  else
+    console.log("Error occurred, server can't start", error);
+}
 );

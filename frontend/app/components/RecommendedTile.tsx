@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, View, Image } from "react-native";
 import styles from "./RecommendedStyles";
+import { CreateGameCircleButton } from "./Buttons";
 
 type RecommendedProps = {
   recommendedGame: any;
@@ -59,7 +60,17 @@ export default function RecommendedTile(props: RecommendedProps) {
         </View>
       </View>
 
-      <View style={styles.createGameContainer}></View>
+      {/* A create plus button on the recommenderd tile */}
+
+      <View style={styles.createGameContainer}>
+        <CreateGameCircleButton
+          height={50}
+          width={50}
+          color="#0FBE41"
+          pressedColor="#0f6e41"
+          recommendedGame={props.recommendedGame}
+        />
+      </View>
     </View>
   );
 }

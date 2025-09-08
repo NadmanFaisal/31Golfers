@@ -73,3 +73,34 @@ model HourlyForecast {
   dailyForecast    DailyForecast  @relation(fields: [dailyForecastId], references: [id])
   dailyForecastId  String         @db.ObjectId
 }
+
+type Player {
+  id          String
+  displayName String
+
+  // Optional because only owner player will have userId
+  userId      String?
+  order       Int
+  isOwner     Boolean
+}
+
+model CompletedGame {
+  id               String        @id @map("_id")
+
+  totalHoles       Int
+  startedAt        DateTime
+  endedAt          DateTime
+  teeTime          DateTime
+  courseName       String
+
+  players          Player[]
+  strokesByPlayer  Json
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  ownerUserId      String
+
+  @@index([startedAt])
+  @@index([ownerUserId])
+}

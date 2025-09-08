@@ -1,12 +1,12 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
-import { Text, Button, SafeAreaView, View } from "react-native";
+import { Text, SafeAreaView, View } from "react-native";
 
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
 import RecommendedTile from "../components/RecommendedTile";
-import { TeeOffButton } from "../components/Buttons";
+import { StartGamenButton, TeeOffButton } from "../components/Buttons";
 
 import { getAllLocations } from "../api/location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -49,15 +49,15 @@ export default function HomeScreen() {
   const handleTimeSelected = (d: Date) => {
     setTeeOffTime(d);
   };
-
-  const handleLogout = () => {
-    // Deletes the token for new token to be stored
-    SecureStore.deleteItemAsync("token");
-    router.dismissTo("/(auth)/login");
-  };
-
   const getAllLocationsObjects = async () => {
+    // 1) Restore previously chosen location immediately (offline-first)
+    const COURSES_KEY = "GolfCourses";
+    const LOCATION_KEY = "Location";
+    const savedLocation = await AsyncStorage.getItem(LOCATION_KEY);
+    if (savedLocation) setLocation(savedLocation);
+
     try {
+      // 2) Try online
       const response = await getAllLocations(token);
       const formatted = response.data.map((gc: any) => ({
         label: gc.name,
@@ -65,19 +65,33 @@ export default function HomeScreen() {
         latitude: gc.latitude,
         longitude: gc.longitude,
       }));
-      setGolfCourses(formatted);
 
-      // restore last chosen location or set default
-      const saved = await AsyncStorage.getItem("Location");
-      if (saved) {
-        setLocation(saved);
-      } else if (formatted.length > 0) {
+      setGolfCourses(formatted);
+      await AsyncStorage.setItem(COURSES_KEY, JSON.stringify(formatted));
+
+      // 3) If we had no saved location, pick a default from the fresh list
+      if (!savedLocation && formatted.length > 0) {
         await setNewLocation(formatted[0].label);
       }
 
       console.log("Dropdown-ready locations: ", formatted);
     } catch (err) {
-      console.error("Error in getAllLocationsObject:", err);
+      console.error("Error in getAllLocationsObjects:", err);
+
+      // 4) Offline fallback: use cached courses (if any)
+      const cached = await AsyncStorage.getItem(COURSES_KEY);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setGolfCourses(parsed);
+        } catch {}
+      }
+
+      // 5) If we still don't have a location, pick first cached (if present)
+      if (!savedLocation && cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.length > 0) await setNewLocation(parsed[0].label);
+      }
     }
   };
 
@@ -89,7 +103,6 @@ export default function HomeScreen() {
    * @param {string} location The new location value.
    */
   const setNewLocation = async (location: string) => {
-    await AsyncStorage.removeItem("Location");
     await AsyncStorage.setItem("Location", location);
     setLocation(location);
   };
@@ -224,7 +237,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.mainContainer}>
       <View style={styles.mainContainer}>
         {/* /////////////////////// Weather Tile Stuff down here ///////////////////////  */}
 
@@ -252,26 +265,27 @@ export default function HomeScreen() {
               onTimeSelected={handleTimeSelected}
             />
           </View>
-          <View style={styles.lowerSelectionContainer}></View>
+          <View style={styles.lowerSelectionContainer}>
+            <StartGamenButton
+              text="Start a Game!"
+              height={75}
+              width={350}
+              color="#0FBE41"
+              pressedColor="#0f6e41"
+              recommendedGame={recommendedGame}
+              location={location}
+            />
+          </View>
         </View>
 
         <View style={styles.gameRecommendationContainer}>
           <View style={styles.recommendedTitleContainer}>
             <Text style={styles.recommendedTitleLabel}>Recommended</Text>
-            {/* <Text>Location: {location}</Text>
-            <Text>Time: {teeOffTime?.toString()}</Text> */}
+            {/*<Text>Location: {location}</Text>
+            <Text>Time: {teeOffTime?.toString()}</Text>*/}
           </View>
           <RecommendedTile recommendedGame={recommendedGame} />
-
-          <Button
-            onPress={() => handleLogout()}
-            title="Log out"
-            color="#841584"
-            accessibilityLabel="Sign up as a user!"
-          />
         </View>
-
-        <View style={styles.footerNavigationContainer}></View>
       </View>
     </SafeAreaView>
   );

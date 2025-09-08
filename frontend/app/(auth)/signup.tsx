@@ -7,6 +7,7 @@ import styles from "./styles";
 import { signupUser } from "../api/auth";
 import { AuthorizationInputField } from "../components/inputFields";
 import { AuthorizationButton } from "../components/Buttons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function DetailsScreen() {
   const [email, setEmail] = useState("");
@@ -38,6 +39,9 @@ export default function DetailsScreen() {
 
         // Stores the token for future authorization
         SecureStore.setItem("token", response.data.token);
+        await AsyncStorage.setItem("Username", response.data.user.username);
+        await AsyncStorage.setItem("Email", response.data.user.email);
+        await AsyncStorage.setItem("UserID", response.data.user.id);
 
         // Navigate to homepage
         router.dismissTo("/(home)/home");

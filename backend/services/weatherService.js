@@ -115,6 +115,44 @@ async function getTodaySunset(courseName) {
 }
 
 /**
+ * Fetches given course's current sunrise time
+ * @param {String} courseName Name of the golf course
+ * @returns {Promise<Date>} Date object representing today's sunrise time for the given course
+ */
+async function getTodaySunrise(courseName) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // midnight
+
+  // Fetches the first instance of the day
+  const daily = await prisma.dailyForecast.findFirst({
+    where: {
+      courseName,
+      date: {
+        gte: today,
+        lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+      }
+    },
+    select: { sunrise: true }
+  });
+
+  if (!daily) throw new Error(`No daily forecast found for ${courseName} today`);
+
+  // Converts sunrise data to Date
+  const sunriseParts = daily.sunrise.split(/[: ]/); // e.g. ["6", "12", "AM"]
+  let sunriseHour = parseInt(sunriseParts[0], 10);
+  const sunriseMinute = parseInt(sunriseParts[1], 10);
+  const ampm = sunriseParts[2];
+
+  if (ampm === "PM" && sunriseHour !== 12) sunriseHour += 12;
+  if (ampm === "AM" && sunriseHour === 12) sunriseHour = 0;
+
+  const sunriseDate = new Date(today);
+  sunriseDate.setHours(sunriseHour, sunriseMinute, 0, 0);
+
+  return sunriseDate;
+}
+
+/**
  * Fetches the hourly precipitation from a given start time 
  * to a given end time
  * @param {String} courseName Name of the golf course
@@ -201,5 +239,6 @@ module.exports = {
   saveHourlyForecasts,
   getTodaySunset,
   getHourlyPrecip,
+  getTodaySunrise,
   getWeather
 };

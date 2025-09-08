@@ -9,6 +9,12 @@ const styles = StyleSheet.create({
     padding: 4,
     margin: 6,
   },
+  inputField: {
+    borderWidth: 1,
+    borderRadius: 7,
+    padding: 4,
+    margin: 6,
+  },
 });
 
 export default styles;

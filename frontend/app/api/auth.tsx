@@ -51,4 +51,3 @@ export async function loginUser(email: string, password: string) {
     throw new Error(message);
   }
 }
-
