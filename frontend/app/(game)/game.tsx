@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Pressable,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native";
 import { getCurrentOfflineGame } from "../database/offlineGameStore";
 import { LocalGame } from "../types/offline";
 import { router, useFocusEffect } from "expo-router";
@@ -15,6 +15,7 @@ import * as SecureStore from "expo-secure-store";
 import styles from "./gameStyles";
 
 import OngoingGameTile from "../components/OngoingGameTile";
+import HistoryTiles from "../components/HistoryTiles";
 import { getAllGames } from "../api/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,6 +28,8 @@ export default function GameScreen() {
   const [userID, setUserID] = useState("");
 
   const [refreshing, setRefreshing] = React.useState(false);
+
+  const [previousGames, setPreviousGames] = useState<LocalGame[]>([]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -57,6 +60,7 @@ export default function GameScreen() {
       const response = await getAllGames(userID, token);
       if (response.status === 200) {
         console.log("Previous games:", response.data);
+        setPreviousGames(response.data);
       }
     } catch (err: any) {
       console.error("Error in getPreviousGames:", err);
@@ -103,31 +107,34 @@ export default function GameScreen() {
   );
 
   return (
-    <SafeAreaView>
-      <ScrollView
-        contentContainerStyle={styles.mainContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={styles.recomGameContainer}>
-          <OngoingGameTile
-            ongoingGame={currentOfflineGame}
-            onPress={gotoGameInfoScreen}
-          />
-        </View>
-        <View style={styles.historyContainer}>
-          <View>
+    <SafeAreaView style={styles.mainContainer}>
+      <View style={styles.mainContainer}>
+        <ScrollView
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            width: "100%",
+          }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={styles.recomGameContainer}>
+            <OngoingGameTile
+              ongoingGame={currentOfflineGame}
+              onPress={gotoGameInfoScreen}
+            />
+          </View>
+          <View style={styles.historyContainer}>
             <View style={styles.historyLabelContainer}>
               <Text style={styles.label}>Previous Games: </Text>
             </View>
-
-            <ScrollView
-              contentContainerStyle={styles.historyGameContainer}
-            ></ScrollView>
           </View>
-        </View>
-      </ScrollView>
+
+          <HistoryTiles games={previousGames} />
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
