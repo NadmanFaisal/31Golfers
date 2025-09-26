@@ -18,6 +18,7 @@ import OngoingGameTile from "../components/OngoingGameTile";
 import HistoryTiles from "../components/HistoryTiles";
 import { getAllGames } from "../api/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { HistoryScoreModal } from "../components/Modals";
 
 export default function GameScreen() {
   const [currentOfflineGame, setCurrentOfflineGame] =
@@ -30,6 +31,14 @@ export default function GameScreen() {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const [previousGames, setPreviousGames] = useState<LocalGame[]>([]);
+
+  const [scoreModalVisible, setScoreModalVisible] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<any | null>(null);
+
+  const openScores = (game: any) => {
+    setSelectedGame(game);
+    setScoreModalVisible(true);
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -132,8 +141,14 @@ export default function GameScreen() {
             </View>
           </View>
 
-          <HistoryTiles games={previousGames} />
+          <HistoryTiles games={previousGames} onPress={(g) => openScores(g)} />
         </ScrollView>
+
+        <HistoryScoreModal
+          modalVisible={scoreModalVisible}
+          setModalVisible={setScoreModalVisible}
+          game={selectedGame}
+        />
       </View>
     </SafeAreaView>
   );

@@ -1,5 +1,4 @@
 import { Href, Stack, usePathname, useRouter, useSegments } from "expo-router";
-import { useState } from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function RootLayout() {
@@ -32,7 +31,6 @@ export default function RootLayout() {
 function Footer() {
   // Keep track of current route to not re-enter the same screen
   // Set to home as this is the first screen after login/signup
-  const [currentRoute, setCurrentRoute] = useState("/(home)/home");
   const router = useRouter();
   const pathname = usePathname();
 

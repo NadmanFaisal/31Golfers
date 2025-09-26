@@ -1,10 +1,10 @@
-import React from "react";
 import { View, Text, ScrollView } from "react-native";
 
 import styles from "./OngoingGameTileStyles";
 
 import { NavigationButton } from "./Buttons";
 import MiniScoreTable from "./MiniScoreTable";
+import React from "react";
 
 type TileProp = {
   ongoingGame?: any;

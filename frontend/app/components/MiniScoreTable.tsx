@@ -1,5 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import styles from "./MiniScoreTableStyles";
+import React from "react";
 
 type Player = { id: string; displayName: string };
 type StrokesByPlayer = Record<string, Array<number | undefined>>;

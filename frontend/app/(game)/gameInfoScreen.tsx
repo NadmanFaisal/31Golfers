@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from "react-native";
+import { SafeAreaView, Text, View, Alert } from "react-native";
 import { LocalGame } from "../types/offline";
 import {
   getCurrentOfflineGame,
@@ -22,6 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import ScoreTable from "../components/ScoreTable";
 
 import styles from "./gameInfoScreenStyles";
+import React from "react";
 
 export default function GameInfoScreen() {
   const [token, setToken] = useState("");

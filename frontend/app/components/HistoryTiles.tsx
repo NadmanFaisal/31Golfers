@@ -6,14 +6,14 @@ import { NavigationButton } from "./Buttons";
 
 type TileProp = {
   games?: any;
-  onPress?: () => void;
+  onPress?: (game: any) => void;
 };
 
 export default function HistoryTiles(props: TileProp) {
   if (!props.games) {
     return (
       <View style={styles.noGameTile}>
-        <Text style={styles.noGameLabel}>No games right now.</Text>
+        <Text style={styles.noGameLabel}>No history.</Text>
       </View>
     );
   }
@@ -47,6 +47,7 @@ export default function HistoryTiles(props: TileProp) {
               width={75}
               color="#349dff"
               pressedColor="#3337ff"
+              onPress={() => props.onPress?.(game)}
             />
           </View>
         </View>

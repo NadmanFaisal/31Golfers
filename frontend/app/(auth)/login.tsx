@@ -8,6 +8,7 @@ import { loginUser } from "../api/auth";
 import { AuthorizationInputField } from "../components/inputFields";
 import { AuthorizationButton } from "../components/Buttons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
 
 export default function DetailsScreen() {
   const [email, setEmail] = useState("");
