@@ -6,7 +6,11 @@ import { Text, SafeAreaView, View } from "react-native";
 import styles from "./styles";
 import WeatherTile from "../components/WeatherTile";
 import RecommendedTile from "../components/RecommendedTile";
-import { StartGamenButton, TeeOffButton } from "../components/Buttons";
+import {
+  StartGamenButton,
+  TeeOffDateButton,
+  TeeOffTimeButton,
+} from "../components/Buttons";
 
 import { getAllLocations } from "../api/location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,8 +18,9 @@ import { getWeather } from "../api/weather";
 import { getRecommendedGameSession } from "../api/game";
 
 export default function HomeScreen() {
-  // The start time for getting recommended game
+  const [teeOffDate, setTeeOffDate] = useState<Date>(new Date());
   const [teeOffTime, setTeeOffTime] = useState<Date>(new Date());
+  const [combinedTeeOff, setCombinedTeeOff] = useState<Date>(new Date());
 
   // The location (golfCourse) where the recommended game
   // is to be fetched
@@ -46,9 +51,36 @@ export default function HomeScreen() {
   };
 
   // Updates the time variable from the child component
-  const handleTimeSelected = (d: Date) => {
-    setTeeOffTime(d);
+  const handleTimeSelected = (t: Date) => {
+    setTeeOffTime((prev) => {
+      const next = new Date(t);
+      // also update the combined value your effects depend on:
+      const combined = combineDateAndTime(teeOffDate, next);
+      setCombinedTeeOff(combined);
+      return next;
+    });
   };
+
+  const handleDateSelected = (d: Date) => {
+    setTeeOffDate((prev) => {
+      const next = new Date(d);
+      const combined = combineDateAndTime(next, teeOffTime);
+      setCombinedTeeOff(combined);
+      return next;
+    });
+  };
+
+  const combineDateAndTime = (date: Date, time: Date) => {
+    const combined = new Date(date);
+    combined.setHours(
+      time.getHours(),
+      time.getMinutes(),
+      time.getSeconds(),
+      time.getMilliseconds(),
+    );
+    return combined;
+  };
+
   const getAllLocationsObjects = async () => {
     // 1) Restore previously chosen location immediately (offline-first)
     const COURSES_KEY = "GolfCourses";
@@ -169,13 +201,13 @@ export default function HomeScreen() {
    */
   const getRecommendedGame = async () => {
     try {
-      if (!teeOffTime) return;
+      if (!combinedTeeOff) return;
 
-      console.log("Tee off time: ", teeOffTime);
+      console.log("Tee off time: ", combinedTeeOff);
       const response = await getRecommendedGameSession(
         token,
         location,
-        teeOffTime,
+        combinedTeeOff,
         18,
         13,
       );
@@ -187,10 +219,16 @@ export default function HomeScreen() {
     }
   };
 
+  // keep combined up to date on initial mount
+  useEffect(() => {
+    setCombinedTeeOff(combineDateAndTime(teeOffDate, teeOffTime));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!token || !location) return;
     getRecommendedGame();
-  }, [token, location, teeOffTime]);
+  }, [token, location, combinedTeeOff]);
 
   // Fetch weather data from the backend according to location and date
   useEffect(() => {
@@ -256,9 +294,19 @@ export default function HomeScreen() {
 
         <View style={styles.selectionContainer}>
           <View style={styles.upperSelectionContainer}>
-            <TeeOffButton
+            <TeeOffDateButton
               height={75}
-              width={350}
+              width={170}
+              fontSize={15}
+              color="#3B82F6"
+              pressedColor="#1E40AF"
+              text="Set Tee Off date"
+              onDateSelected={handleDateSelected}
+            />
+            <TeeOffTimeButton
+              height={75}
+              width={170}
+              fontSize={15}
               color="#ff8e31ff"
               pressedColor="#e46600ff"
               text="Set Tee Off time"
@@ -282,7 +330,7 @@ export default function HomeScreen() {
           <View style={styles.recommendedTitleContainer}>
             <Text style={styles.recommendedTitleLabel}>Recommended</Text>
             {/*<Text>Location: {location}</Text>
-            <Text>Time: {teeOffTime?.toString()}</Text>*/}
+            <Text>Time: {combinedeeOff?.toString()}</Text>*/}
           </View>
           <RecommendedTile recommendedGame={recommendedGame} />
         </View>

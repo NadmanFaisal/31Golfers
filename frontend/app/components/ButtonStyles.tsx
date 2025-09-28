@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     fontFamily: "Barlow Condensed",
     fontStyle: "normal",
     fontWeight: 500,
+    paddingLeft: 5,
   },
   teeOffButton: {
     display: "flex",

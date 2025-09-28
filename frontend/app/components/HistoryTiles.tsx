@@ -10,7 +10,7 @@ type TileProp = {
 };
 
 export default function HistoryTiles(props: TileProp) {
-  if (!props.games) {
+  if (!props.games || props.games.length === 0) {
     return (
       <View style={styles.noGameTile}>
         <Text style={styles.noGameLabel}>No history.</Text>

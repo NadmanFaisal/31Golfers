@@ -55,7 +55,7 @@ async function fetchAndSaveWeather() {
     try {
       const course = await saveCourse(locationName, lat, lon);
 
-      const response = await weatherapi.get_weather(lat, lon, 1);
+      const response = await weatherapi.get_weather(lat, lon, 5);
       console.log("Weathers: ", response.data.forecast.forecastday);
       const forecastDays = response.data.forecast.forecastday;
 
