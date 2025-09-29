@@ -20,6 +20,8 @@ type tableProps = {
 };
 
 export default function ScoreTable(props: tableProps) {
+  const players = props.game?.players ?? [];
+
   return (
     <ScrollView
       horizontal
@@ -33,7 +35,7 @@ export default function ScoreTable(props: tableProps) {
           <View style={[styles.holeHeaderCell, styles.headerCell]}>
             <Text style={styles.headerText}>Hole</Text>
           </View>
-          {(props.game?.players ?? []).map((p: any) => (
+          {players.map((p: any) => (
             <View
               key={p.id}
               style={[styles.playerHeaderCell, styles.headerCell]}
@@ -57,17 +59,14 @@ export default function ScoreTable(props: tableProps) {
             </View>
 
             {/* One score cell per player, with inline editable */}
-            {(props.game?.players ?? []).map((p: any, colIdx: any) => {
+            {players.map((p: any, colIdx: number) => {
               const strokes = props.game?.strokesByPlayer?.[p.id] || [];
               const val = strokes[hole - 1];
 
-              // Necessary for getting WHICH cell to edit.
               const isEditing =
                 props.editingCell?.playerId === p.id &&
                 props.editingCell?.hole === hole;
 
-              // Itterates through all the cells and checks whether
-              // it is eligible for editing
               if (props.isEditing && isEditing) {
                 return (
                   <View
@@ -112,6 +111,37 @@ export default function ScoreTable(props: tableProps) {
             })}
           </View>
         ))}
+
+        {/* Totals row */}
+        <View key="totals-row" style={[styles.bodyRow, styles.totalsRow]}>
+          <View style={[styles.holeCell, styles.totalsLabelCell]}>
+            <Text style={[styles.bodyText, styles.totalsText]}>Total</Text>
+          </View>
+          {players.map((p: any, colIdx: number) => {
+            const strokes: (number | undefined | null)[] =
+              props.game?.strokesByPlayer?.[p.id] || [];
+
+            const total = strokes.reduce<number>(
+              (sum, v) => (typeof v === "number" ? sum + v : sum),
+              0,
+            );
+            const hasAny = strokes.some((v) => typeof v === "number");
+
+            return (
+              <View
+                key={`total-${p.id}`}
+                style={[
+                  styles.scoreCell,
+                  colIdx === 0 ? styles.firstScoreCol : undefined,
+                ]}
+              >
+                <Text style={[styles.bodyText, styles.totalsText]}>
+                  {hasAny ? String(total) : "–"}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
       </View>
     </ScrollView>
   );

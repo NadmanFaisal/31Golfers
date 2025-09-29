@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: "100%",
     width: "100%",
+    backgroundColor: "rgba(52, 52, 52, 0.8)",
   },
   gameCreateCenteredView: {
     display: "flex",
@@ -135,6 +136,42 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+  },
+  scoreModalView: {
+    display: "flex",
+    flexDirection: "column",
+    height: "65%",
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scoreConfirmationContainer: {
+    display: "flex",
+    flexDirection: "row",
+    height: "8%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  modalTitleContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "10%",
+  },
+  courseNameLabel: {
+    color: "#5e5e5eff",
+    fontSize: 18,
+    fontWeight: 500,
+  },
+  dateLabel: {
+    color: "#5e5e5eff",
+    fontSize: 14,
+    fontWeight: 500,
   },
 });
 

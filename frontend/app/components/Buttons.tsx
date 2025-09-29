@@ -4,7 +4,11 @@ import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
 import styles from "./ButtonStyles";
 import { router } from "expo-router";
-import { SelectTeeOffTimeButton, CreateGameModal } from "./Modals";
+import {
+  SelectTeeOffTimeButton,
+  CreateGameModal,
+  SelectTeeOffDateButton,
+} from "./Modals";
 
 type buttonProp = {
   height?: number;
@@ -15,6 +19,7 @@ type buttonProp = {
   pressedColor?: string;
   onPress?: () => void;
   onTimeSelected?: (date: Date) => void;
+  onDateSelected?: (date: Date) => void;
   recommendedGame?: any;
   location?: any;
 };
@@ -189,7 +194,7 @@ export const CreateGameCircleButton = (props: buttonProp) => {
   );
 };
 
-export const TeeOffButton = (props: buttonProp) => {
+export const TeeOffTimeButton = (props: buttonProp) => {
   // localm time variable to keep track of change
   const [time, setTime] = useState<Date>(new Date());
 
@@ -245,6 +250,68 @@ export const TeeOffButton = (props: buttonProp) => {
         setModalVisible={setModalVisible}
         onDone={onDone}
         time={time}
+        onDateChange={onChange}
+      />
+    </>
+  );
+};
+
+export const TeeOffDateButton = (props: buttonProp) => {
+  // local date variable to keep track of change
+  const [date, setDate] = useState<Date>(new Date());
+
+  // Controls the visibility of Modal
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Function to keep track of date change within the date picker
+  const onChange = (_e: DateTimePickerEvent, selected?: Date) => {
+    if (selected) {
+      setDate(selected);
+    }
+  };
+
+  /**
+   * Communicates the date value back to the parent
+   * component, while also updating local date variable.
+   */
+  const onDone = () => {
+    setDate(date);
+    props.onDateSelected?.(date);
+    setModalVisible(false);
+  };
+
+  return (
+    <>
+      <Pressable
+        style={({ pressed }) => [
+          styles.teeOffButton,
+          {
+            height: props.height ?? "100%",
+            width: props.width ?? "100%",
+            backgroundColor: pressed
+              ? props.pressedColor
+              : (props.color ?? "#999999ff"),
+          },
+        ]}
+        onPress={() => setModalVisible(true)}
+      >
+        <Image
+          style={styles.teeoffLogo}
+          source={require("../../assets/images/white_clock_icon.png")}
+          resizeMode="contain"
+        />
+        <Text style={[styles.buttonText, { fontSize: props.fontSize ?? 20 }]}>
+          {props.text ?? "Select Date"}
+        </Text>
+      </Pressable>
+
+      {/* Modal view allows users to select date */}
+
+      <SelectTeeOffDateButton
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onDone={onDone}
+        date={date}
         onDateChange={onChange}
       />
     </>

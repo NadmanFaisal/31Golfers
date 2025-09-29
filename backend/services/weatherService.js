@@ -97,7 +97,7 @@ async function getTodaySunset(courseName) {
     select: { sunset: true }
   });
 
-  if (!daily) throw new Error(`No daily forecast found for ${courseName} today`);
+  if (!daily) throw new Error(`No sunset data found for ${courseName} today`);
 
   // Converts sunset data to Date
   const sunsetParts = daily.sunset.split(/[: ]/); // ["6", "32", "PM"]

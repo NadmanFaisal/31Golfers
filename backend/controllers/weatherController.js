@@ -17,6 +17,6 @@ exports.get_weather_data = async (req, res) => {
         console.error(err);
 
         // Return error response with status/message
-        res.status(err.status || 500).json({ error: error.message || 'Failed to fetch weather data' });
+        res.status(err.status || 500).json({ error: err.message || 'Failed to fetch weather data' });
     }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, Modal, Pressable, View } from "react-native";
+import { Text, Modal, Pressable, View, ScrollView } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -15,15 +15,18 @@ import {
 } from "../database/offlineGameStore";
 import { LocalGame } from "../types/offline";
 import { router } from "expo-router";
+import ScoreTable from "./ScoreTable";
 
 type modalProp = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
   time?: Date;
+  date?: Date;
   onDateChange?: (e: DateTimePickerEvent, date?: Date) => void;
   onDone?: () => any;
   recommendedGame?: any;
   location?: string;
+  game?: any;
 };
 
 export const CreateGameModal = (props: modalProp) => {
@@ -227,6 +230,98 @@ export const SelectTeeOffTimeButton = (props: modalProp) => {
             onChange={props.onDateChange}
             style={{ alignSelf: "center" }}
           />
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+export const SelectTeeOffDateButton = (props: modalProp) => {
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={props.modalVisible}
+      onRequestClose={() => {
+        props.setModalVisible(!props.modalVisible);
+      }}
+    >
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <View style={styles.confirmationContainer}>
+            <Pressable
+              style={styles.confirmationButton}
+              onPress={() => {
+                props.setModalVisible(!props.modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.confirmationButton}
+              onPress={() => {
+                props.onDone?.();
+              }}
+            >
+              <Text style={styles.textStyle}>Done</Text>
+            </Pressable>
+          </View>
+          <DateTimePicker
+            value={props.date ?? new Date()}
+            mode="date"
+            display="spinner"
+            themeVariant="light"
+            onChange={props.onDateChange}
+            style={{ alignSelf: "center" }}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+export const HistoryScoreModal = (props: modalProp) => {
+  const close = () => props.setModalVisible(false);
+
+  if (!props.game) return;
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent
+      visible={props.modalVisible}
+      onRequestClose={close}
+    >
+      <View style={styles.centeredView}>
+        <View style={[styles.scoreModalView]}>
+          <View style={styles.scoreConfirmationContainer}>
+            <Pressable style={styles.confirmationButton} onPress={close}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.modalTitleContainer}>
+            <Text style={styles.courseNameLabel}>{props.game.courseName}</Text>
+            <Text style={styles.dateLabel}>
+              {new Date(props.game.createdAt).toLocaleDateString("en-US", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </Text>
+          </View>
+
+          <ScrollView>
+            <ScoreTable
+              game={props.game}
+              isEditing={false}
+              editingCell={null}
+              inputValue=""
+              setInputValue={() => {}}
+            />
+          </ScrollView>
         </View>
       </View>
     </Modal>

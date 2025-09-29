@@ -68,6 +68,17 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
+  totalsRow: {
+    borderTopWidth: 1,
+    borderColor: "#e5e5e5",
+    backgroundColor: "#fafafa",
+  },
+  totalsText: {
+    fontWeight: "600",
+  },
+  totalsLabelCell: {
+    backgroundColor: "transparent",
+  },
 });
 
 export default styles;
