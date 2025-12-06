@@ -10,6 +10,12 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
   },
+  scrollView: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    width: "100%",
+  },
   refreshContainer: {
     alignItems: "center",
     justifyContent: "flex-start",
@@ -39,7 +45,7 @@ const styles = StyleSheet.create({
   label: {
     color: "#5e5e5eff",
     fontSize: 24,
-    fontWeight: 500,
+    fontWeight: "500",
   },
   historyGameContainer: {
     display: "flex",

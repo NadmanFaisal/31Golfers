@@ -1,7 +1,4 @@
 const { api } = require('./api')
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
 
 const API_KEY = process.env.WEATHER_API_KEY
 

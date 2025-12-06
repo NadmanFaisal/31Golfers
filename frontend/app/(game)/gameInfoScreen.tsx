@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView, Text, View, Alert } from "react-native";
 import { LocalGame } from "../types/offline";
 import {
@@ -7,14 +7,13 @@ import {
   setStrokeOffline,
   getOfflineGame,
 } from "../database/offlineGameStore";
-import { FinishGamenButton } from "../components/Buttons";
 import { router, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-
-import ScoreTable from "../components/ScoreTable";
+import { FinishGameButton } from "../components/ui/buttons/FinishGameButton";
+import ScoreTable from "../components/features/ScoreTable";
 
 import styles from "./gameInfoScreenStyles";
-import React from "react";
+
 
 export default function GameInfoScreen() {
   const [token, setToken] = useState("");
@@ -81,18 +80,39 @@ export default function GameInfoScreen() {
           style: "destructive", // iOS red button
           onPress: async () => {
             try {
-              const game = await completeOfflineGame(
+              const result = await completeOfflineGame(
                 currentOfflineGame.id,
                 token,
               );
-              if (!game) {
+
+              if (!result || !result.game) {
                 Alert.alert("Game could not be completed. Please try again.");
                 return;
               }
+
+              const { synced } = result;
+
               setCurrentOfflineGame(null);
-              Alert.alert(
-                "Game finished. We’ll sync it to the backend when online.",
-              );
+
+              // 1. Guest Case:
+              if (token === "GUEST") {
+                Alert.alert(
+                  "Game Finished locally",
+                  "This game is local and will not be synced. Please join or log in to sync next games."
+                );
+              }
+              // 2. Server Offline / Sync Failed Case:
+              else if (!synced) {
+                Alert.alert(
+                  "Game Finished offline",
+                  "You are offline or the server is unreachable. Game will be synced when online."
+                );
+              }
+              // 3. Online & Synced Case:
+              else {
+                Alert.alert("Game finished! It has been synced to your history.");
+              }
+
               router.dismissTo("/game");
             } catch (e: any) {
               Alert.alert(e?.message);
@@ -143,7 +163,7 @@ export default function GameInfoScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <FinishGamenButton
+          <FinishGameButton
             height={50}
             width={175}
             text="Finish Game!"

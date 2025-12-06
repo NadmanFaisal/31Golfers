@@ -22,6 +22,7 @@ model GolfCourse {
   name           String          @unique
   latitude       Float
   longitude      Float
+  timezone       String          @default("UTC") // Store IANA timezone e.g. "Asia/Dhaka"
   
   /** 
   * Relation between golf course and daily forecast, 

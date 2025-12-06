@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const { getTodaySunset, getHourlyPrecip, getTodaySunrise } = require("./weatherService");
+const { getSunset, getHourlyPrecip, getSunrise } = require("./weatherService");
 
 /**
  * Calculates the playable hours in a course given the 
@@ -16,9 +16,9 @@ const { getTodaySunset, getHourlyPrecip, getTodaySunrise } = require("./weatherS
 async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole) {
   const pacePerHole = pperHole; // minutes per hole
 
-  // Step 1: Get sunset and sunrise data for today
-  const sunset = await getTodaySunset(courseName);
-  const sunrise = await getTodaySunrise(courseName);
+  // Step 1: Get sunset and sunrise data for the teeOffTime date
+  const sunset = await getSunset(courseName, teeOffTime);
+  const sunrise = await getSunrise(courseName, teeOffTime);
 
   // If the start time is at or after sunset, then there is no recommendation
   if (teeOffTime >= sunset || teeOffTime <= sunrise || sunrise >= sunset) {
@@ -85,14 +85,14 @@ async function calculatePlayableHoles(courseName, teeOffTime, numHoles, pperHole
 async function saveGame(payload) {
   console.log(payload);
   if (!payload || !payload.id || !payload.totalHoles || !payload.startedAt) {
-   const err = new Error("Invalid payload: id, totalHoles, startedAt are required");
+    const err = new Error("Invalid payload: id, totalHoles, startedAt are required");
     err.statusCode = 400;
     throw err;
   }
 
   const startedAt = new Date(payload.startedAt);
-  const endedAt   = new Date(payload.endedAt);
-  const teeTime   = new Date(payload.teeTime);
+  const endedAt = new Date(payload.endedAt);
+  const teeTime = new Date(payload.teeTime);
   if (!startedAt) {
     const err = new Error("Invalid startedAt");
     err.statusCode = 400;
@@ -115,7 +115,7 @@ async function saveGame(payload) {
   const ownerUserId =
     players.find((p) => p && p.isOwner && p.userId)?.userId ?? undefined;
 
-    const strokesByPlayer =
+  const strokesByPlayer =
     payload.strokesByPlayer && typeof payload.strokesByPlayer === "object"
       ? payload.strokesByPlayer
       : {};
@@ -156,16 +156,16 @@ async function saveGame(payload) {
  * @param {string=} userID - only return games that include this user
  */
 async function getAllGames(userID) {
-  
+
   // To find games where the user is owner, or one 
   // of the players 
   const where = userID
     ? {
-        OR: [
-          { ownerUserId: userID },
-          { players: { some: { userId: userID } } }
-        ],
-      }
+      OR: [
+        { ownerUserId: userID },
+        { players: { some: { userId: userID } } }
+      ],
+    }
     : {};
 
   const games = await prisma.completedGame.findMany({

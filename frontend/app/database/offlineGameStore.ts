@@ -130,12 +130,18 @@ export async function setStrokeOffline({
   return game;
 }
 
-async function flushPendingCompletedGames(token: string) {
+async function flushPendingCompletedGames(token: string, realUserId?: string) {
+  // If guest, do not attempt to sync with backend.
+  if (token === "GUEST") {
+    console.log("[OfflineStore] Guest user, skipping sync of pending games.");
+    return;
+  }
+
   const ids = await getPending();
   if (ids.length === 0) return;
 
   for (const id of [...ids]) {
-    await syncCurrentGameWithBackend(id, token);
+    await syncCurrentGameWithBackend(id, token, realUserId);
   }
 }
 
@@ -153,23 +159,111 @@ export async function completeOfflineGame(gameId: string, token: string) {
 
   await addPending(gameId);
   await flushPendingCompletedGames(token);
-  return game;
+
+  // Check if the game is still pending to determine if sync was successful
+  const pending = await getPending();
+  const synced = !pending.includes(gameId);
+
+  return { game, synced };
 }
 
-async function syncCurrentGameWithBackend(gameId: string, token: string) {
+async function syncCurrentGameWithBackend(gameId: string, token: string, realUserId?: string) {
   // Sync the offline game with the backend
   try {
     const game = await getOfflineGame(gameId);
     if (!game || !game.endedAt) throw new Error("Game not ready");
+
+    // If we have a real user ID (from login sync), associate the owner player with it
+    if (realUserId) {
+      console.log(`[Sync] Updating game ${gameId} with realUserID: ${realUserId}`);
+      let ownerFound = false;
+      game.players = game.players.map(p => {
+        // Update if owner, OR if the userID is explicitly the placeholder "GUEST"
+        if (p.isOwner || p.userId === "GUEST") {
+          ownerFound = true;
+          console.log(`[Sync] Found owner/guest player: ${p.displayName}. Updating ID.`);
+          return { ...p, userId: realUserId, isOwner: true };
+        }
+        return p;
+      });
+
+      // Safety net: If no owner found (rare bugs?), assign first player
+      if (!ownerFound && game.players.length > 0) {
+        console.warn("[Sync] No owner found in guest game, assigning first player as owner.");
+        game.players[0] = { ...game.players[0], isOwner: true, userId: realUserId };
+      }
+    } else {
+      console.warn("[Sync] No realUserId provided for sync!");
+    }
+
     const response = await postCompletedGame(game, token);
     // On success, clear local copy (if that’s your policy)
     if (response.status === 200) {
+      console.log(`[Sync] Game ${gameId} synced successfully. Deleting local copy.`);
       await AsyncStorage.removeItem(K.game(gameId));
       // Also ensure it isn’t in pending
       await removePending(gameId);
     }
-  } catch {
-    alert("Currently offline. Come back online to sync progress with cloud.");
+  } catch (e) {
+    console.warn("Sync failed for game " + gameId, e);
     await addPending(gameId);
   }
 }
+// Exposed function to CLEAR guest data on login (User requested to delete instead of sync)
+export async function clearOfflineGames() {
+  console.log("[OfflineStore] Clearing offline games...");
+  const ids = await getPending();
+  for (const id of ids) {
+    await AsyncStorage.removeItem(K.game(id));
+  }
+  // Clear pending list
+  await AsyncStorage.removeItem(PENDING);
+  // Also clear index if we want to be thorough, but pending covers "completed" games.
+  // "Current" game is handled by specific key.
+  await AsyncStorage.removeItem(K.currentGameId);
+
+  // Clear the main index of games?
+  // The history hook reads from 'K.index' or pending?
+  // 'getIndex' reads 'K.index'. 'createOfflineGame' updates 'K.index'.
+  // So to fully clear history:
+  const allGameIds = await getIndex();
+  for (const id of allGameIds) {
+    await AsyncStorage.removeItem(K.game(id));
+  }
+  await AsyncStorage.removeItem(K.index);
+
+  console.log("[OfflineStore] Offline games cleared.");
+}
+
+// Kept for reference but unused now (or used by login.tsx to clear)
+export async function syncOfflineGamesPayload(token: string, userId: string) {
+  // Guest transition: clear data
+  await clearOfflineGames();
+}
+
+// NEW: For authenticated users to sync their offline games when they come online
+export async function retrySyncPendingGames(token: string, userId: string) {
+  if (!token || token === "GUEST") return;
+  console.log("[OfflineStore] Retrying sync for pending games...");
+  // We pass userId just in case, though for logged-in users creating games,
+  // the game should already have the correct userId. 
+  // The sync logic will only overwrite if it sees "GUEST" or isOwner.
+  // So it's safe.
+  await flushPendingCompletedGames(token, userId);
+}
+
+// Fetch all pending games with their full data
+export async function getPendingGames(): Promise<LocalGame[]> {
+  const ids = await getPending();
+  const games = await Promise.all(ids.map(id => getOfflineGame(id)));
+  // Filter out any nulls in case of corruption
+  return games.filter((g): g is LocalGame => g !== null);
+}
+
+// Function to upload a specific game *just in case* it wasn't marked pending but exists
+// Or used for "Guest" games that are technically "Current" but need to be saved to backend now?
+// Actually, 'flushPendingCompletedGames' syncs *completed* games.
+// The user requirement says "games stored in the offline database will be synched".
+// This likely implies *completed* games that were played offline.
+// If there is an *active* offline game, it might remain local until finished?
+// Let's assume standard "flushPending" is what we want.

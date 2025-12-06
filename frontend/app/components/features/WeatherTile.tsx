@@ -11,16 +11,28 @@ type WeatherProps = {
   weather: any;
   location: string;
   onLocationChange?: (location: string) => void;
+  error?: string | null;
 };
+
+import { TouchableOpacity } from "react-native";
+import WeatherDetailsModal from "../ui/modals/WeatherDetailsModal";
 
 export default function WeatherTile(props: WeatherProps) {
   // List of all the golf courses
 
   // Drop down menu's selections
   const [isFocus, setIsFocus] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.weatherContainer}>
+      <WeatherDetailsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        weather={props.weather}
+        currentWeather={props.currentWeather}
+        location={props.location}
+      />
       <View style={styles.cloudContainer}>
         <View style={styles.topLocationContainer}>
           <Dropdown
@@ -36,7 +48,7 @@ export default function WeatherTile(props: WeatherProps) {
             valueField="value"
             placeholder={props.location ? props.location : "Select location"}
             searchPlaceholder="Search..."
-            value={location}
+            value={props.location} // Fixed: was value={location} which is undefined in scope
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={(item) => {
@@ -56,13 +68,17 @@ export default function WeatherTile(props: WeatherProps) {
 
       <View style={styles.temperatureContainer}>
         <View style={styles.topDetailsContainer}>
-          <Text style={styles.moreDetailsLabel}>More details &gt;</Text>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Text style={styles.moreDetailsLabel}>More details &gt;</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.middleTempContainer}>
           <Text style={styles.tempLabel}>
-            {props.currentWeather
-              ? `${props.currentWeather.temp_c} °C`
-              : "Loading..."}
+            {props.error
+              ? "Unavailable"
+              : props.currentWeather
+                ? `${props.currentWeather.temp_c} °C`
+                : "Loading..."}
           </Text>
         </View>
 
@@ -70,7 +86,7 @@ export default function WeatherTile(props: WeatherProps) {
           <View style={styles.weatherLabelContainer}>
             <Image
               style={styles.weatherLogo}
-              source={require("../../assets/images/weather_logos/Rain.png")}
+              source={require("../../../assets/images/weather_logos/Rain.png")}
               resizeMode="contain"
             />
             <Text style={styles.weatherLabel}>
@@ -81,7 +97,7 @@ export default function WeatherTile(props: WeatherProps) {
           <View style={styles.weatherLabelContainer}>
             <Image
               style={styles.weatherLogo}
-              source={require("../../assets/images/weather_logos/Humidity.png")}
+              source={require("../../../assets/images/weather_logos/Humidity.png")}
               resizeMode="contain"
             />
             <Text style={styles.weatherLabel}>
@@ -92,7 +108,7 @@ export default function WeatherTile(props: WeatherProps) {
           <View style={styles.weatherLabelContainer}>
             <Image
               style={styles.weatherLogo}
-              source={require("../../assets/images/weather_logos/Wind_Speed.png")}
+              source={require("../../../assets/images/weather_logos/Wind_Speed.png")}
               resizeMode="contain"
             />
             <Text style={styles.weatherLabel}>
@@ -103,7 +119,7 @@ export default function WeatherTile(props: WeatherProps) {
           <View style={styles.weatherLabelContainer}>
             <Image
               style={styles.weatherLogo}
-              source={require("../../assets/images/weather_logos/UV.png")}
+              source={require("../../../assets/images/weather_logos/UV.png")}
               resizeMode="contain"
             />
             <Text style={styles.weatherLabel}>

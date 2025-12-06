@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./HistoryTilesStyles";
 import { View, Text, ScrollView } from "react-native";
 import MiniScoreTable from "./MiniScoreTable";
-import { NavigationButton } from "./Buttons";
+import { NavigationButton } from "../ui/buttons/NavigationButton";
 
 type TileProp = {
   games?: any;
@@ -10,7 +10,7 @@ type TileProp = {
 };
 
 export default function HistoryTiles(props: TileProp) {
-  if (!props.games || props.games.length === 0) {
+  if (!props.games || !Array.isArray(props.games) || props.games.length === 0) {
     return (
       <View style={styles.noGameTile}>
         <Text style={styles.noGameLabel}>No history.</Text>

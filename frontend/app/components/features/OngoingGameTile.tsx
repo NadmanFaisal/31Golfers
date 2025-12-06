@@ -2,7 +2,7 @@ import { View, Text, ScrollView } from "react-native";
 
 import styles from "./OngoingGameTileStyles";
 
-import { NavigationButton } from "./Buttons";
+import { NavigationButton } from "../ui/buttons/NavigationButton";
 import MiniScoreTable from "./MiniScoreTable";
 import React from "react";
 
