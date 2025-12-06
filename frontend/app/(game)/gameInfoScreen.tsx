@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView, Text, View, Alert } from "react-native";
 import { LocalGame } from "../types/offline";
 import {
@@ -7,14 +7,12 @@ import {
   setStrokeOffline,
   getOfflineGame,
 } from "../database/offlineGameStore";
-import { FinishGamenButton } from "../components/Buttons";
 import { router, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-
-import ScoreTable from "../components/ScoreTable";
+import { FinishGameButton } from "../components/ui/buttons/FinishGameButton";
+import ScoreTable from "../components/features/ScoreTable";
 
 import styles from "./gameInfoScreenStyles";
-import React from "react";
 
 export default function GameInfoScreen() {
   const [token, setToken] = useState("");
@@ -143,7 +141,7 @@ export default function GameInfoScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <FinishGamenButton
+          <FinishGameButton
             height={50}
             width={175}
             text="Finish Game!"

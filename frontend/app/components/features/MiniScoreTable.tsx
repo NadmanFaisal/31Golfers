@@ -3,7 +3,7 @@ import styles from "./MiniScoreTableStyles";
 import React from "react";
 
 type Player = { id: string; displayName: string };
-type StrokesByPlayer = Record<string, Array<number | undefined>>;
+type StrokesByPlayer = Record<string, (number | undefined)[]>;
 
 export default function MiniScoreTable({
   players,

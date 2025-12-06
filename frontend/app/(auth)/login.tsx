@@ -1,14 +1,13 @@
 import { SafeAreaView, Text, View, Image, Alert } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 
 import styles from "./styles";
 import { loginUser } from "../api/auth";
-import { AuthorizationInputField } from "../components/inputFields";
-import { AuthorizationButton } from "../components/Buttons";
+import { AuthorizationInputField } from "../components/ui/inputFields";
+import { AuthorizationButton } from "../components/ui/buttons/AuthorizationButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React from "react";
 
 export default function DetailsScreen() {
   const [email, setEmail] = useState("");

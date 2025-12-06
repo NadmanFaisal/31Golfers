@@ -1,130 +1,48 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  Pressable,
   RefreshControl,
   ScrollView,
   Text,
   View,
+  SafeAreaView,
 } from "react-native";
-import { SafeAreaView } from "react-native";
-import { getCurrentOfflineGame } from "../database/offlineGameStore";
-import { LocalGame } from "../types/offline";
-import { router, useFocusEffect } from "expo-router";
-import * as SecureStore from "expo-secure-store";
+import { router } from "expo-router";
 
 import styles from "./gameStyles";
+import { ROUTES } from "../../constants/routes";
 
-import OngoingGameTile from "../components/OngoingGameTile";
-import HistoryTiles from "../components/HistoryTiles";
-import { getAllGames } from "../api/game";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { HistoryScoreModal } from "../components/Modals";
+import OngoingGameTile from "../components/features/OngoingGameTile";
+import HistoryTiles from "../components/features/HistoryTiles";
+import { HistoryScoreModal } from "../components/ui/modals/HistoryScoreModal";
+
+import { useAuth } from "../hooks/useAuth";
+import { useGames } from "../hooks/useGames";
+import { LocalGame } from "../types/offline";
 
 export default function GameScreen() {
-  const [currentOfflineGame, setCurrentOfflineGame] =
-    useState<LocalGame | null>(null);
-
-  const [token, setToken] = useState("");
-
-  const [userID, setUserID] = useState("");
-
-  const [refreshing, setRefreshing] = React.useState(false);
-
-  const [previousGames, setPreviousGames] = useState<LocalGame[]>([]);
+  const { token, userID } = useAuth();
+  const { currentOfflineGame, previousGames, refreshing, onRefresh } = useGames(
+    userID,
+    token,
+  );
 
   const [scoreModalVisible, setScoreModalVisible] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<any | null>(null);
+  const [selectedGame, setSelectedGame] = useState<LocalGame | null>(null);
 
-  const openScores = (game: any) => {
+  const openScores = (game: LocalGame) => {
     setSelectedGame(game);
     setScoreModalVisible(true);
   };
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    if (userID && token) {
-      getPreviousGames();
-    }
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, [token, userID]);
-
-  const getToken = async () => {
-    const fetchedToken = await SecureStore.getItemAsync("token");
-    if (!fetchedToken) {
-      router.dismissTo("/(auth)/login");
-    } else {
-      setToken(fetchedToken);
-    }
-  };
-
   const gotoGameInfoScreen = () => {
-    router.push("/gameInfoScreen");
+    router.push(ROUTES.GAME_INFO);
   };
-
-  const getPreviousGames = async () => {
-    console.log("Reached");
-    try {
-      const response = await getAllGames(userID, token);
-      if (response.status === 200) {
-        console.log("Previous games:", response.data);
-        setPreviousGames(response.data);
-      }
-    } catch (err: any) {
-      console.error("Error in getPreviousGames:", err);
-    }
-  };
-
-  const getUserID = async () => {
-    try {
-      const id = await AsyncStorage.getItem("UserID");
-      if (id) {
-        console.log("UserID: ", id);
-        setUserID(id);
-      }
-    } catch (err) {
-      console.error("Error getting user id:", err);
-    }
-  };
-
-  useEffect(() => {
-    getUserID();
-  }, []);
-
-  useEffect(() => {
-    getToken();
-  }, []);
-
-  useEffect(() => {
-    if (!token || !userID) return;
-    getPreviousGames();
-  }, [token, userID]);
-
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-      (async () => {
-        const g = await getCurrentOfflineGame();
-        if (active) setCurrentOfflineGame(g);
-        console.log("Current offline game:", g);
-      })();
-      return () => {
-        active = false;
-      };
-    }, []),
-  );
 
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.mainContainer}>
         <ScrollView
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            width: "100%",
-          }}
+          style={styles.scrollView}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

@@ -1,23 +1,26 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const moment = require('moment-timezone');
 
 /**
  * Create or update a golf course in the database.
  * @param {string} name The golf course name (must be unique)
  * @param {string|number} lat Latitude
  * @param {string|number} lon Longitude
+ * @param {string} timezone IANA timezone ID (e.g., "Asia/Dhaka")
  * @returns {Promise<Object>} The saved course record
  */
-async function saveCourse(name, lat, lon) {
+async function saveCourse(name, lat, lon, timezone = 'UTC') {
   // upsert() so it will insert if not found, otherwise update.
   return prisma.golfCourse.upsert({
     where: { name },
-    // If records exist, don't update
-    update: {},
+    // If records exist, update timezone just in case
+    update: { timezone },
     create: {
       name,
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
+      timezone
     },
   });
 }
@@ -58,7 +61,9 @@ async function saveDailyForecast(courseName, courseId, forecastDay) {
  */
 async function saveHourlyForecasts(dailyForecastId, courseName, hourlyData) {
   const hourlyForecasts = hourlyData.map(hour => ({
-    time: new Date(hour.time),
+    // Use time_epoch (seconds) * 1000 for absolute UTC Date
+    // This ignores the localized "time" string, ensuring global correctness
+    time: new Date(hour.time_epoch * 1000),
     temp_c: hour.temp_c,
     courseName,
     wind_kph: hour.wind_kph,
@@ -75,81 +80,101 @@ async function saveHourlyForecasts(dailyForecastId, courseName, hourlyData) {
 }
 
 /**
- * Fetches given course's current sunset time
+ * Fetches given course's sunset time for a specific date
  * @param {String} courseName Name of the golf course
- * @returns {Promise<Date>} Date object representing today's sunset time for the given course
+ * @param {Date} date The date to check
+ * @returns {Promise<Date>} Date object representing sunset time
  */
-async function getTodaySunset(courseName) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // midnight
+/**
+ * Fetches given course's sunset time for a specific date, accounting for timezone.
+ * @param {String} courseName Name of the golf course
+ * @param {Date} date The date to check (UTC or with specific TZ)
+ * @returns {Promise<Date>} Date object representing sunset time (absolute UTC timestamp)
+ */
+async function getSunset(courseName, date) {
+  // We need to query by the *day* in the course's timezone.
+  // 1. Get the course to find its timezone
+  const course = await prisma.golfCourse.findUnique({
+    where: { name: courseName },
+    select: { timezone: true }
+  });
 
-  // Fetches the first instance of the day
+  const tz = course ? course.timezone : 'UTC';
+
+  // 2. Convert the input date to the start of day in that timezone
+  // This ensures we match the "Date" stored in DailyForecast which is usually midnight00:00
+  // Actually, DailyForecast.date is stored as JS Date from the API's "YYYY-MM-DD" string.
+  // The API returns "2025-12-06", which JS parses as UTC midnight? No, typically UTC.
+  // Let's assume DailyForecast.date matches the date string provided by API.
+
+  // We need to find the DailyForecast that corresponds to the target date.
+  // The safest way is to range query around the target date.
+  const targetMoment = moment(date).tz(tz);
+  const targetDateStr = targetMoment.format('YYYY-MM-DD');
+
+  const startOfDay = new Date(targetDateStr); // UTC midnight of that string
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
   const daily = await prisma.dailyForecast.findFirst({
-
-    // Queries based on course name and date
     where: {
       courseName,
       date: {
-        gte: today,
-        lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+        gte: startOfDay,
+        lt: endOfDay
       }
     },
     select: { sunset: true }
   });
 
-  if (!daily) throw new Error(`No sunset data found for ${courseName} today`);
+  if (!daily) throw new Error(`No sunset data found for ${courseName} on ${targetDateStr}`);
 
-  // Converts sunset data to Date
-  const sunsetParts = daily.sunset.split(/[: ]/); // ["6", "32", "PM"]
-  let sunsetHour = parseInt(sunsetParts[0], 10);
-  const sunsetMinute = parseInt(sunsetParts[1], 10);
-  const ampm = sunsetParts[2];
+  // 3. Parse the localized sunset string ("05:12 PM") combined with the date string into a moment in the correct TZ
+  // e.g. "2025-12-06 05:12 PM" in "Asia/Dhaka" context
+  const sunsetTimeString = `${targetDateStr} ${daily.sunset}`;
+  // moment format for "05:12 PM" is "hh:mm A"
+  const sunsetMoment = moment.tz(sunsetTimeString, "YYYY-MM-DD hh:mm A", tz);
 
-  if (ampm === "PM" && sunsetHour !== 12) sunsetHour += 12;
-  if (ampm === "AM" && sunsetHour === 12) sunsetHour = 0;
-
-  const sunsetDate = new Date(today);
-  sunsetDate.setHours(sunsetHour, sunsetMinute, 0, 0);
-
-  return sunsetDate;
+  return sunsetMoment.toDate(); // Return native JS Date (UTC)
 }
 
 /**
- * Fetches given course's current sunrise time
+ * Fetches given course's sunrise time for a specific date, accounting for timezone.
  * @param {String} courseName Name of the golf course
- * @returns {Promise<Date>} Date object representing today's sunrise time for the given course
+ * @param {Date} date The date to check
+ * @returns {Promise<Date>} Date object representing sunrise time (absolute UTC timestamp)
  */
-async function getTodaySunrise(courseName) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // midnight
+async function getSunrise(courseName, date) {
+  const course = await prisma.golfCourse.findUnique({
+    where: { name: courseName },
+    select: { timezone: true }
+  });
 
-  // Fetches the first instance of the day
+  const tz = course ? course.timezone : 'UTC';
+  const targetMoment = moment(date).tz(tz);
+  const targetDateStr = targetMoment.format('YYYY-MM-DD');
+
+  const startOfDay = new Date(targetDateStr);
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
   const daily = await prisma.dailyForecast.findFirst({
     where: {
       courseName,
       date: {
-        gte: today,
-        lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+        gte: startOfDay,
+        lt: endOfDay
       }
     },
     select: { sunrise: true }
   });
 
-  if (!daily) throw new Error(`No daily forecast found for ${courseName} today`);
+  if (!daily) throw new Error(`No sunrise data found for ${courseName} on ${targetDateStr}`);
 
-  // Converts sunrise data to Date
-  const sunriseParts = daily.sunrise.split(/[: ]/); // e.g. ["6", "12", "AM"]
-  let sunriseHour = parseInt(sunriseParts[0], 10);
-  const sunriseMinute = parseInt(sunriseParts[1], 10);
-  const ampm = sunriseParts[2];
+  const sunriseTimeString = `${targetDateStr} ${daily.sunrise}`;
+  const sunriseMoment = moment.tz(sunriseTimeString, "YYYY-MM-DD hh:mm A", tz);
 
-  if (ampm === "PM" && sunriseHour !== 12) sunriseHour += 12;
-  if (ampm === "AM" && sunriseHour === 12) sunriseHour = 0;
-
-  const sunriseDate = new Date(today);
-  sunriseDate.setHours(sunriseHour, sunriseMinute, 0, 0);
-
-  return sunriseDate;
+  return sunriseMoment.toDate();
 }
 
 /**
@@ -237,8 +262,8 @@ module.exports = {
   saveCourse,
   saveDailyForecast,
   saveHourlyForecasts,
-  getTodaySunset,
+  getSunset,
   getHourlyPrecip,
-  getTodaySunrise,
+  getSunrise,
   getWeather
 };

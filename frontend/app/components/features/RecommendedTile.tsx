@@ -1,12 +1,24 @@
+import React from "react";
 import { Text, View, Image } from "react-native";
 import styles from "./RecommendedStyles";
-import { CreateGameCircleButton } from "./Buttons";
+import { CreateGameCircleButton } from "../ui/buttons/CreateGameCircleButton";
 
 type RecommendedProps = {
   recommendedGame: any;
+  error?: string | null;
 };
 
 export default function RecommendedTile(props: RecommendedProps) {
+  if (props.error) {
+    return (
+      <View style={styles.recommendedGameContainer}>
+        <Text style={styles.holesLabel}>
+          {props.error} Check back later.
+        </Text>
+      </View>
+    );
+  }
+
   if (!props.recommendedGame) return null;
 
   if (
@@ -25,7 +37,7 @@ export default function RecommendedTile(props: RecommendedProps) {
       <View style={styles.pictureContainer}>
         <Image
           style={styles.logoContainer}
-          source={require("../../assets/images/golf_cart.png")}
+          source={require("../../../assets/images/golf_cart.png")}
           resizeMode="contain"
         />
       </View>
@@ -39,7 +51,7 @@ export default function RecommendedTile(props: RecommendedProps) {
         <View style={styles.informationLabelContainer}>
           <Image
             style={styles.informationPicture}
-            source={require("../../assets/images/black_clock_icon.png")}
+            source={require("../../../assets/images/black_clock_icon.png")}
             resizeMode="contain"
           />
           <Text style={styles.gameInformationLabel}>
@@ -50,7 +62,7 @@ export default function RecommendedTile(props: RecommendedProps) {
         <View style={styles.informationLabelContainer}>
           <Image
             style={styles.informationPicture}
-            source={require("../../assets/images/location_icon.png")}
+            source={require("../../../assets/images/location_icon.png")}
             resizeMode="contain"
           />
           <Text style={styles.gameInformationLabel}>
