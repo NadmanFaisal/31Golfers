@@ -34,6 +34,7 @@ jobs:
           tags: carbonatedwaterr/31-golfers-backend:latest
 
   frontend-docker-build-push:
+    needs: backend-docker-build-push
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
