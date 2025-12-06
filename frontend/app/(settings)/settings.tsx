@@ -48,14 +48,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
-        <View style={{ width: 50 }} />
-      </View>
+
 
       <View style={styles.content}>
         <View style={styles.section}>
@@ -107,29 +100,9 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2F2F7", // iOS system gray
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
     backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E5EA",
   },
-  backButton: {
-    padding: 5,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: "#007AFF",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
+
   content: {
     padding: 20,
   },
@@ -138,11 +111,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    // Add border to separate from white background since we removed the gray bg
+    borderWidth: 1,
+    borderColor: "#E5E5EA",
   },
   sectionTitle: {
     fontSize: 14,
