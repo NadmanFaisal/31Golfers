@@ -131,6 +131,12 @@ export async function setStrokeOffline({
 }
 
 async function flushPendingCompletedGames(token: string, realUserId?: string) {
+  // If guest, do not attempt to sync with backend.
+  if (token === "GUEST") {
+    console.log("[OfflineStore] Guest user, skipping sync of pending games.");
+    return;
+  }
+
   const ids = await getPending();
   if (ids.length === 0) return;
 
@@ -153,7 +159,12 @@ export async function completeOfflineGame(gameId: string, token: string) {
 
   await addPending(gameId);
   await flushPendingCompletedGames(token);
-  return game;
+
+  // Check if the game is still pending to determine if sync was successful
+  const pending = await getPending();
+  const synced = !pending.includes(gameId);
+
+  return { game, synced };
 }
 
 async function syncCurrentGameWithBackend(gameId: string, token: string, realUserId?: string) {
