@@ -39,6 +39,18 @@ export default function DetailsScreen() {
         await AsyncStorage.setItem("Email", response.data.user.email);
         await AsyncStorage.setItem("UserID", response.data.user.id);
 
+        // SYNC OFFLINE GAMES
+        try {
+          // Dynamic import or direct usage if possible. 
+          // Since login.tsx is a component, we can import directly.
+          // User requested to DELETE guest games on login, not sync.
+          const { clearOfflineGames } = require("../database/offlineGameStore");
+          await clearOfflineGames();
+          console.log("Guest games cleared successfully");
+        } catch (e) {
+          console.warn("Failed to sync offline games on login:", e);
+        }
+
         // Navigate to homepage
         router.dismissTo("/(home)/home");
         return;
@@ -91,6 +103,22 @@ export default function DetailsScreen() {
             pressedColor="#818181ff"
             onPress={() => router.dismissTo("/signup")}
           />
+          <View style={{ marginTop: 20 }}>
+            <AuthorizationButton
+              text="Continue as Guest"
+              height={50}
+              width={200}
+              color="#3B82F6"
+              pressedColor="#1E40AF"
+              onPress={async () => {
+                await SecureStore.setItemAsync("token", "GUEST");
+                // Can set dummy user data if needed to avoid logic breaks
+                await AsyncStorage.setItem("UserID", "GUEST");
+                await AsyncStorage.setItem("Username", "GuestUser");
+                router.dismissTo("/(home)/home");
+              }}
+            />
+          </View>
         </View>
       </View>
     </SafeAreaView>

@@ -20,6 +20,11 @@ export function useWeather(token: string, location: string, date: Date) {
       }
     }
 
+    if (token === "GUEST") {
+      setWeather(null);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await getWeather(token, location, date);
@@ -77,7 +82,9 @@ export function useWeather(token: string, location: string, date: Date) {
     weather,
     currentWeather,
     loading,
-    error: weather ? null : "Data not available",
+    error: (token === "GUEST")
+      ? "Sign up to view weather"
+      : (weather ? null : "Data not available"),
     refreshWeather: fetchWeather,
   };
 }
